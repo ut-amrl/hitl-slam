@@ -25,10 +25,10 @@
 #include <QtGui/QApplication>
 #include <QWidget>
 
-#include "cobot_msgs/GuiKeyboardEvent.h"
-#include "cobot_msgs/GuiMouseClickEvent.h"
-#include "cobot_msgs/GuiMouseMoveEvent.h"
-#include "cobot_msgs/LocalizationGuiCaptureSrv.h"
+#include "vector_slam_msgs/GuiKeyboardEvent.h"
+#include "vector_slam_msgs/GuiMouseClickEvent.h"
+#include "vector_slam_msgs/GuiMouseMoveEvent.h"
+#include "vector_slam_msgs/LocalizationGuiCaptureSrv.h"
 #include "util.h"
 #include "geometry.h"
 #include "popt_pp.h"
@@ -36,9 +36,10 @@
 #include "ros/ros.h"
 #include "../shared/util/helpers.h"
 #include "terminal_utils.h"
+#include "../shared/util/timer.h"
 #include "vector_display.h"
 #include "vector_display_thread.h"
-#include "../map/vector_map.h"
+//#include "../map/vector_map.h"
 #include "configreader.h"
 
 using Eigen::Vector2f;
@@ -54,9 +55,9 @@ ros::Publisher mouse_move_publisher_;
 ros::Publisher keyboard_events_publisher_;
 ros::ServiceServer capture_service_;
 
-cobot_msgs::GuiMouseMoveEvent mouse_move_msg_;
-cobot_msgs::GuiMouseClickEvent mouse_click_msg_;
-cobot_msgs::GuiKeyboardEvent keyboard_events_msg_;
+vector_slam_msgs::GuiMouseMoveEvent mouse_move_msg_;
+vector_slam_msgs::GuiMouseClickEvent mouse_click_msg_;
+vector_slam_msgs::GuiKeyboardEvent keyboard_events_msg_;
 
 VectorDisplayThread* thread_ = NULL;
 VectorDisplay* display_ = NULL;
@@ -96,8 +97,8 @@ void MouseClickCallback(
   mouse_click_publisher_.publish(mouse_click_msg_);
 }
 
-bool CaptureCallback(cobot_msgs::LocalizationGuiCaptureSrv::Request& req,
-                     cobot_msgs::LocalizationGuiCaptureSrv::Response& res) {
+bool CaptureCallback(vector_slam_msgs::LocalizationGuiCaptureSrv::Request& req,
+                     vector_slam_msgs::LocalizationGuiCaptureSrv::Response& res) {
   printf("Saving image to %s\n", req.filename.c_str());
   if (display_ != NULL) {
     display_->Capture(req.filename);
@@ -203,13 +204,13 @@ int main(int argc, char *argv[]) {
 
   ros::NodeHandle node_handle;
   mouse_move_publisher_ =
-      node_handle.advertise<cobot_msgs::GuiMouseMoveEvent>(
+      node_handle.advertise<vector_slam_msgs::GuiMouseMoveEvent>(
       "Cobot/VectorLocalization/GuiMouseMoveEvents", 1, false);
   mouse_click_publisher_ =
-      node_handle.advertise<cobot_msgs::GuiMouseClickEvent>(
+      node_handle.advertise<vector_slam_msgs::GuiMouseClickEvent>(
       "Cobot/VectorLocalization/GuiMouseClickEvents", 1, false);
   keyboard_events_publisher_ =
-      node_handle.advertise<cobot_msgs::GuiKeyboardEvent>(
+      node_handle.advertise<vector_slam_msgs::GuiKeyboardEvent>(
       "Cobot/VectorLocalization/GuiKeyboardEvents", 1, false);
   capture_service_ = node_handle.advertiseService(
       "VectorLocalization/Capture", CaptureCallback);
@@ -224,7 +225,7 @@ int main(int argc, char *argv[]) {
   thread_ = new VectorDisplayThread(mapsFolder, display_, &node_handle, app);
   const string map_name = (map_option == NULL) ? "LGRC3" : string(map_option);
   thread_->setOptions(testMode, map_name, saveLocs, liveView, persistentDisplay,
-      savePoses, blankDisplay, maxFps, edit_map, nav_map, semantic_map,
+      savePoses, blankDisplay, maxFps, nav_map, semantic_map,
       semantic_view, nav_view, vector_file);
 
   display_->setMouseClickCallback(&MouseClickCallback);

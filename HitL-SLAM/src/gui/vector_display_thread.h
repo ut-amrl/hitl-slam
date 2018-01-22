@@ -39,16 +39,16 @@
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/PointCloud.h>
 
-#include "cobot_msgs/LidarDisplayMsg.h"
-#include "cobot_msgs/CobotHumansDetected.h"
-#include "cobot_msgs/CobotHumansClassified.h"
-#include "cobot_msgs/CobotRemoteInterfaceSrv.h"
-#include "cobot_msgs/CobotStatusMsg.h"
-#include "cobot_msgs/CobotLocalizationMsg.h"
-#include "cobot_msgs/CobotAnomalyMonitorRectangleMsg.h"
+#include "vector_slam_msgs/LidarDisplayMsg.h"
+//#include "vector_slam_msgs/CobotHumansDetected.h"
+//#include "vector_slam_msgs/CobotHumansClassified.h"
+#include "vector_slam_msgs/CobotRemoteInterfaceSrv.h"
+#include "vector_slam_msgs/CobotStatusMsg.h"
+#include "vector_slam_msgs/CobotLocalizationMsg.h"
+#include "vector_slam_msgs/CobotAnomalyMonitorRectangleMsg.h"
 #include "vector_display.h"
-#include "../map/vector_map.h"
-#include "../map/navigation_map.h"
+//#include "../map/vector_map.h"
+//#include "../map/navigation_map.h"
 
 class ScopedFile;
 
@@ -62,7 +62,7 @@ private:
   bool runApp;
   bool testMode;
   bool mapEditMode;
-  bool navMapMode;
+//  bool navMapMode;
   bool semanticMapMode;
   bool semanticViewMode;
   bool navViewMode;
@@ -89,10 +89,10 @@ private:
   VectorDisplay* display;
   std::string map_name_;
 
-  NavigationMap navMap;
+//  NavigationMap navMap;
 
   std::string mapsFolder;
-  VectorMap vectorMap;
+  //VectorMap vectorMap;
   std::vector<Eigen::Vector2f> pathPlan;
   Eigen::Vector2f robotLoc;
   float robotAngle;
@@ -101,12 +101,12 @@ private:
   float anomalyURX;
   float anomalyURY;
   float anomaly;
-  cobot_msgs::CobotHumansDetected humansMsg;
-  cobot_msgs::CobotHumansClassified classifiedHumansMsg;
+  //vector_slam_msgs::CobotHumansDetected humansMsg;
+  //vector_slam_msgs::CobotHumansClassified classifiedHumansMsg;
   sensor_msgs::LaserScan laserScanMsg;
   sensor_msgs::LaserScan kinectScanMsg;
   sensor_msgs::PointCloud pointCloudMsg;
-  std::vector<cobot_msgs::LidarDisplayMsg> displayMsgs;
+  std::vector<vector_slam_msgs::LidarDisplayMsg> displayMsgs;
   std::vector<std::string> displayProviders;
   double tPathPlan, tLaser, tPointCloud, tHumanDetect, tHumanTrack;
 
@@ -162,23 +162,23 @@ public:
                std::vector<VectorDisplay::Color>* lineColors);
 
   void cobotLocalizationCallback(
-      const cobot_msgs::CobotLocalizationMsg& msg);
+      const vector_slam_msgs::CobotLocalizationMsg& msg);
 
   void cobotAnomalyCallback(
-      const cobot_msgs::CobotAnomalyMonitorRectangleMsg& msg);
+      const vector_slam_msgs::CobotAnomalyMonitorRectangleMsg& msg);
 
   void kinectScanCallback(const sensor_msgs::LaserScan& msg);
 
   void laserCallback(const sensor_msgs::LaserScan& msg);
 
-  void cobotStatusCallback(const cobot_msgs::CobotStatusMsg& msg);
+  void cobotStatusCallback(const vector_slam_msgs::CobotStatusMsg& msg);
 
-  void humanDetectionCallback(const cobot_msgs::CobotHumansDetected& msg);
+  //void humanDetectionCallback(const vector_slam_msgs::CobotHumansDetected& msg);
 
-  void humanTrackingCallback(const cobot_msgs::CobotHumansClassified& msg);
+  //void humanTrackingCallback(const vector_slam_msgs::CobotHumansClassified& msg);
 
   void statusCallback(
-      const ros::MessageEvent<const cobot_msgs::LidarDisplayMsg>& msgEvent);
+      const ros::MessageEvent<const vector_slam_msgs::LidarDisplayMsg>& msgEvent);
 
   void filteredPointCloudCallback(const sensor_msgs::PointCloud& msg);
 
@@ -194,10 +194,16 @@ public:
     this->liveView = liveView;
   }
 
+//  void setOptions(
+//      bool testMode, std::string mapName, bool saveLocs, bool liveView,
+//      bool persistentDisplay, bool saveOrientations, bool blankDisplay,
+//      float maxFps, bool mapEditMode, bool navMapMode, bool semanticMapMode,
+//      bool semanticViewMode, bool navViewMode, bool viewVectorFile);
+
   void setOptions(
       bool testMode, std::string mapName, bool saveLocs, bool liveView,
       bool persistentDisplay, bool saveOrientations, bool blankDisplay,
-      float maxFps, bool mapEditMode, bool navMapMode, bool semanticMapMode,
+      float maxFps, bool mapEditMode, bool semanticMapMode,
       bool semanticViewMode, bool navViewMode, bool viewVectorFile);
 
 protected:

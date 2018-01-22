@@ -126,10 +126,10 @@ FIND_LIBRARY(GLEW_LIBRARY
 #INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/navigation)
 #INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/net)
 #INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/opengl)
-#INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/perception_tools)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/perception_tools)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/shared/math)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/shared/util)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/extern_libraries/CImg)
+#INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/extern_libraries/CImg)
 #INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/vector_localization)
 
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/cobot)
@@ -141,8 +141,10 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/extern_libraries/CImg)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/docking)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/shared/math)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/shared/util)
+
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/gui)
-add_subdirectory(${PROJECT_SOURCE_DIR}/src/HitL)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/human_in_the_loop_slam)
+
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/hardware)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/human_detector)
 #kinect elsewhere
@@ -159,14 +161,20 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src/HitL)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/planar_slam)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/polygon_triangulation)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/pose_estimation)
+
 add_subdirectory(${PROJECT_SOURCE_DIR}/src/perception_tools)
+
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/remembrances)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/rgb_feature_detection)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/system)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/test)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/vector_localization)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/vector_mapping)
-add_subdirectory(${PROJECT_SOURCE_DIR}/src/vmapping)
+
+#add_subdirectory(${PROJECT_SOURCE_DIR}/src/episodic_non_merkov_localization)
+#add_subdirectory(${PROJECT_SOURCE_DIR}/src/long_term_vector_mapping)
+
+
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/vector_slam)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/wifi)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/speech_node) --UNCOMMENT before pushing
@@ -227,40 +235,40 @@ SET(SHARED_SRCS
 #  src/hardware/joystick.cc
 #)
 
-SET(MAP_SRCS
-  src/map/navigation_map.cpp
-  src/map/vector_map.cpp
+#SET(MAP_SRCS
+#  src/map/navigation_map.cpp
+#  src/map/vector_map.cpp
   #src/map/stargazer_map.cpp
   #src/map/bitmap_map.cpp
-)
+#)
 
-SET(MAP_3D_SRCS
-  src/map/vector_map3d.cpp
-  src/opengl/glInfo.cpp
-  src/kinect/grahams_scan.cpp
-  src/kinect/plane_filtering.cpp
-  src/map/plane_polygon.cpp
-)
+#SET(MAP_3D_SRCS
+#  src/map/vector_map3d.cpp
+#  src/opengl/glInfo.cpp
+#  src/kinect/grahams_scan.cpp
+#  src/kinect/plane_filtering.cpp
+#  src/map/plane_polygon.cpp
+#)
 
-SET(FSPF_SRCS
-  src/kinect/grahams_scan.cpp
-  src/kinect/plane_filtering.cpp
-  src/map/plane_polygon.cpp
-)
+#SET(FSPF_SRCS
+#  src/kinect/grahams_scan.cpp
+#  src/kinect/plane_filtering.cpp
+#  src/map/plane_polygon.cpp
+#)
 
 SET(PERCEPTION_SRCS
   src/perception_tools/perception_2d.cpp
   #src/delta_calibration/icp.cpp
 )
 
-SET(NAVIGATION_SRCS
-  src/navigation/navigation.cpp
-  ${MAP_SRCS}
-)
+#SET(NAVIGATION_SRCS
+#  src/navigation/navigation.cpp
+#  ${MAP_SRCS}
+#)
 
 SET(GUI_SRCS
   src/gui/vector_display.cpp
-  src/gui/gui_publisher_helper.cpp
+  #src/gui/gui_publisher_helper.cpp
   src/gui/gltext.cpp
 )
 
@@ -297,19 +305,24 @@ ADD_LIBRARY(shared_libraries SHARED ${SHARED_SRCS})
 ADD_DEPENDENCIES(shared_libraries rosbuild_precompile)
 TARGET_LINK_LIBRARIES(shared_libraries shared_libraries ${libs})
 
-ADD_LIBRARY(map_libraries SHARED ${MAP_SRCS})
-ADD_DEPENDENCIES(map_libraries shared_libraries)
-TARGET_LINK_LIBRARIES(map_libraries shared_libraries ${libs} re2)
+#ADD_LIBRARY(map_libraries SHARED ${MAP_SRCS})
+#ADD_DEPENDENCIES(map_libraries shared_libraries)
+#TARGET_LINK_LIBRARIES(map_libraries shared_libraries ${libs} re2)
 
 ADD_LIBRARY(perception_library ${PERCEPTION_SRCS})
 ADD_DEPENDENCIES(perception_library shared_libraries)
 TARGET_LINK_LIBRARIES(perception_library shared_libraries ${libs})
 
 
-ROSBUILD_ADD_LIBRARY(vector_display
-    src/gui/py_vector_display.cpp
-    src/gui/vector_display_thread.cpp)
-TARGET_LINK_LIBRARIES(vector_display gui_libraries)
+
+
+#ROSBUILD_ADD_LIBRARY(vector_display
+#    src/gui/py_vector_display.cpp
+#    src/gui/vector_display_thread.cpp)
+#TARGET_LINK_LIBRARIES(vector_display gui_libraries)
+
+
+
 
 # delete old library, copies source files, runs sip, runs generated makefile, copies .so to lib directory
 #ADD_CUSTOM_TARGET(py_vector_display ALL DEPENDS vector_display ${LIBRARY_OUTPUT_PATH}/py_vector_display.so)
@@ -328,7 +341,7 @@ ADD_LIBRARY(gui_libraries SHARED ${GUI_SRCS} ${GUI_MOC_SRCS})
 ADD_DEPENDENCIES(gui_libraries shared_libraries map_libraries ${GUI_MOC_SRCS})
 TARGET_LINK_LIBRARIES(gui_libraries
     shared_libraries
-    map_libraries
+    #map_libraries
     ${libs}
     ${QT_LIBRARIES})
 TARGET_LINK_LIBRARIES(gui_libraries ${QT_LIBRARIES})

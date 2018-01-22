@@ -1,4 +1,22 @@
-TODO: run install script
-Edit ROS_PACKAGE_PATH in ~/.bashrc to have the path to the root folder
+TODO:
 
-Set up build directory / running cmake / make
+refactor code
+
+remove dead code
+
+new rosmsg names 
+
+test on clean OS to determine necessary libraries
+
+
+
+
+TODO:
+
+Document code
+
+Example data / use
+
+Write install script
+
+Write install instructions

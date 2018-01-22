@@ -26,15 +26,17 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include "cobot_msgs/CobotAnomalyMonitorRectangleMsg.h"
-#include "cobot_msgs/CobotHumansDetected.h"
-#include "cobot_msgs/CobotLocalizationMsg.h"
-#include "cobot_msgs/CobotLocalizationSrv.h"
-#include "cobot_msgs/CobotRemoteInterfaceSrv.h"
-#include "cobot_msgs/CobotStatusMsg.h"
-#include "cobot_msgs/LidarDisplayMsg.h"
+#include "vector_slam_msgs/CobotAnomalyMonitorRectangleMsg.h"
+//#include "vector_slam_msgs/CobotHumansDetected.h"
+#include "vector_slam_msgs/CobotLocalizationMsg.h"
+#include "vector_slam_msgs/CobotLocalizationSrv.h"
+#include "vector_slam_msgs/CobotRemoteInterfaceSrv.h"
+#include "vector_slam_msgs/CobotStatusMsg.h"
+#include "vector_slam_msgs/LidarDisplayMsg.h"
 #include "vector_display.h"
 #include "vector_display_thread.h"
+#include "../shared/math/geometry.h"
+
 
 #include "helpers.h"
 #include "proghelp.h"
@@ -43,13 +45,13 @@
 
 using Eigen::Vector2f;
 using Eigen::Rotation2Df;
-using cobot_msgs::CobotAnomalyMonitorRectangleMsg;
-using cobot_msgs::CobotHumansDetected;
-using cobot_msgs::CobotLocalizationMsg;
-using cobot_msgs::CobotLocalizationSrv;
-using cobot_msgs::CobotRemoteInterfaceSrv;
-using cobot_msgs::CobotStatusMsg;
-using cobot_msgs::LidarDisplayMsg;
+using vector_slam_msgs::CobotAnomalyMonitorRectangleMsg;
+//using vector_slam_msgs::CobotHumansDetected;
+using vector_slam_msgs::CobotLocalizationMsg;
+using vector_slam_msgs::CobotLocalizationSrv;
+using vector_slam_msgs::CobotRemoteInterfaceSrv;
+using vector_slam_msgs::CobotStatusMsg;
+using vector_slam_msgs::LidarDisplayMsg;
 using geometry_msgs::PoseWithCovarianceStamped;
 using std::size_t;
 using std::string;
@@ -155,6 +157,7 @@ void VectorDisplayThread::ChangeMap() {
   QString map_name = QInputDialog::getItem(
       display, tr("Load Map"), tr("Map:"), maps, 0, false, &ok);
   if (ok && !map_name.isEmpty()) {
+    /*
     if (autoUpdateMap && map_name.toStdString().compare(vectorMap.mapName)!= 0) {
       QMessageBox confirmBox;
       confirmBox.setWindowTitle("Confirm");
@@ -170,6 +173,8 @@ void VectorDisplayThread::ChangeMap() {
         return;
       }
     }
+    */
+    /*
     if (mapEditMode) {
       if (vectorMap.saveMap(map_name_)) {
         printf("Saved map %s\n", map_name_.c_str());
@@ -178,6 +183,7 @@ void VectorDisplayThread::ChangeMap() {
         return;
       }
     }
+    
     if (navMapMode) {
       if (navMap.SaveMap(map_name_)) {
         printf("Saved navigation map %s\n", map_name_.c_str());
@@ -201,13 +207,14 @@ void VectorDisplayThread::ChangeMap() {
     }
     if (navViewMode) {
       navMap.LoadMap(map_name.toStdString());
-    }
+    }*/
     printf("Change map to %s\n", map_name.toStdString().c_str());
-    vectorMap.loadMap(map_name.toStdString(), false);
+    //vectorMap.loadMap(map_name.toStdString(), false);
     map_name_ = map_name.toStdString();
   }
 }
 
+/*
 void VectorDisplayThread::AutoLocalize()
 {
   CobotLocalizationSrv srv;
@@ -216,7 +223,7 @@ void VectorDisplayThread::AutoLocalize()
   srv.request.x = robotLoc.x();
   srv.request.y = robotLoc.y();
   autoLocalizeClient.call(srv);
-}
+}*/
 
 void VectorDisplayThread::KeyboardEventCallback(
     uint32_t key_code,uint32_t modifiers) {
@@ -231,24 +238,25 @@ void VectorDisplayThread::KeyboardEventCallback(
       // blankDisplay = !blankDisplay;
     } break;
 
-    case Qt::Key_L : {
-      AutoLocalize();
-      printf("AutoLocalizing robot.\n");
-    } break;
+    //case Qt::Key_L : {
+      //AutoLocalize();
+      //printf("AutoLocalizing robot.\n");
+    //} break;
 
     case Qt::Key_U : {
       autoUpdateMap = !autoUpdateMap;
       printf("AutoUpdateMap: %d\n", autoUpdateMap);
     } break;
 
-    case Qt::Key_N : {
-      printf("Number of lines in map %s: %i\n", vectorMap.mapName.c_str(),
-             int(vectorMap.Lines().size()));
-    } break;
+    //case Qt::Key_N : {
+    //  printf("Number of lines in map %s: %i\n", vectorMap.mapName.c_str(),
+    //         int(vectorMap.Lines().size()));
+    //} break;
   }
   compileDisplay();
 }
 
+/*
 void VectorDisplayThread::editMap(
     const Vector2f& mouse_down, const Vector2f& mouse_up, float orientation,
     uint32_t modifiers) {
@@ -258,6 +266,7 @@ void VectorDisplayThread::editMap(
   std::cout << "MODIFIERS: " << modifiers << std::endl;
 
   switch (modifiers) {
+    
     case 0x04: {
       // Add Line
       vector<line2f> lines = vectorMap.Lines();
@@ -265,7 +274,7 @@ void VectorDisplayThread::editMap(
       vectorMap.updateMap(lines);
       compileDisplay();
     } break;
-
+    
     case 0x02: {
       // Delete Line
       static const float kMaxError = 0.5;
@@ -290,7 +299,9 @@ void VectorDisplayThread::editMap(
     } break;
   }
 }
+*/
 
+/*
 void VectorDisplayThread::editGraph(
     const Vector2f& mouse_down, const Vector2f& mouse_up,
     float orientation, uint32_t modifiers) {
@@ -440,7 +451,7 @@ void VectorDisplayThread::editGraph(
     } break;
   }
 }
-
+*/
 void VectorDisplayThread::MouseEventCallback(
     const Vector2f& mouse_down,
     const Vector2f& mouse_up, float orientation,
@@ -463,6 +474,7 @@ void VectorDisplayThread::MouseEventCallback(
     }
     return;
   }
+  /*
   if (mapEditMode) {
     editMap(mouse_down, mouse_up, orientation, modifiers);
     if (modifiers == 0x01) {
@@ -470,17 +482,19 @@ void VectorDisplayThread::MouseEventCallback(
     }
     return;
   }
-  if (navMapMode || semanticMapMode) {
-    editGraph(mouse_down, mouse_up, orientation, modifiers);
-    return;
-  }
+*/
+  //if (navMapMode || semanticMapMode) {
+  //  editGraph(mouse_down, mouse_up, orientation, modifiers);
+  //  return;
+  //}
   {
     CobotRemoteInterfaceSrv srv;
     srv.request.loc_x = mouse_down.x();
     srv.request.loc_y = mouse_down.y();
     srv.request.orientation = orientation;
     srv.request.command_num = 0;
-    srv.request.map = vectorMap.mapName;
+    //srv.request.map = vectorMap.mapName;
+    srv.request.map = "map_name";
     srv.request.distance_tolerance = 0.25;
     srv.request.angle_tolerance = RAD(5.0);
     switch (modifiers) {
@@ -541,6 +555,8 @@ void VectorDisplayThread::Zoom(float zoom) {
   if (display) display->Zoom(zoom);
 }
 
+/*
+
 void VectorDisplayThread::drawMap(
     vector<VectorDisplay::Line>* lines,
     vector<VectorDisplay::Color>* lineColors) {
@@ -552,33 +568,38 @@ void VectorDisplayThread::drawMap(
   }
 }
 
-void VectorDisplayThread::humanDetectionCallback(
-    const CobotHumansDetected& msg) {
-  humansMsg = msg;
-  tHumanDetect = GetTimeSec();
-  compileDisplay();
-}
+*/
 
-void VectorDisplayThread::humanTrackingCallback(const cobot_msgs::CobotHumansClassified& msg)
-{
-  classifiedHumansMsg = msg;
-  tHumanTrack = GetTimeSec();
-  compileDisplay();
-}
+// void VectorDisplayThread::humanDetectionCallback(
+//     const CobotHumansDetected& msg) {
+//   humansMsg = msg;
+//   tHumanDetect = GetTimeSec();
+//   compileDisplay();
+// }
 
-void VectorDisplayThread::cobotLocalizationCallback(const CobotLocalizationMsg& msg) {
-  robotLoc = Vector2f(msg.x, msg.y);
-  robotAngle = msg.angle;
+// void VectorDisplayThread::humanTrackingCallback(const vector_slam_msgs::CobotHumansClassified& msg)
+// {
+//   classifiedHumansMsg = msg;
+//   tHumanTrack = GetTimeSec();
+//   compileDisplay();
+// }
 
-  if (autoUpdateMap && msg.map.compare(vectorMap.mapName)!= 0) {
-    if (mapEditMode) {
+//void VectorDisplayThread::cobotLocalizationCallback(const CobotLocalizationMsg& msg) {
+ // robotLoc = Vector2f(msg.x, msg.y);
+  //robotAngle = msg.angle;
+
+//  if (autoUpdateMap && msg.map.compare(vectorMap.mapName)!= 0) {
+ //   if (mapEditMode) {
+/*
       if (vectorMap.saveMap(map_name_)) {
         printf("Saved map %s\n", map_name_.c_str());
       } else {
         printf("Error saving map %s\n", map_name_.c_str());
         return;
       }
-    }
+      */
+  //  }
+/*
     if (navMapMode) {
       if (navMap.SaveMap(map_name_)) {
         printf("Saved navigation map %s\n", map_name_.c_str());
@@ -602,13 +623,13 @@ void VectorDisplayThread::cobotLocalizationCallback(const CobotLocalizationMsg& 
     }
     if (navViewMode) {
       navMap.LoadMap(msg.map.c_str());
-    }
+    }*/
 
-    vectorMap.loadMap(msg.map.c_str(), false);
-    map_name_ = msg.map;
-  }
-  compileDisplay();
-}
+    //vectorMap.loadMap(msg.map.c_str(), false);
+//    map_name_ = msg.map;
+//  }
+//  compileDisplay();
+//}
 
 void VectorDisplayThread::cobotAnomalyCallback(const CobotAnomalyMonitorRectangleMsg& msg) {
   static const int X = 0;
@@ -658,7 +679,7 @@ void VectorDisplayThread::cobotStatusCallback(const CobotStatusMsg& msg) {
 void VectorDisplayThread::statusCallback(
     const ros::MessageEvent<LidarDisplayMsg const>& msgEvent) {
   static const bool debug = false;
-  const cobot_msgs::LidarDisplayMsgConstPtr &msg = msgEvent.getConstMessage();
+  const vector_slam_msgs::LidarDisplayMsgConstPtr &msg = msgEvent.getConstMessage();
   bool duplicate = false;
   unsigned int i = 0;
   if (debug) {
@@ -686,8 +707,8 @@ void VectorDisplayThread::clearDisplayMessages() {
   displayProviders.clear();
   laserScanMsg.ranges.clear();
   kinectScanMsg.ranges.clear();
-  humansMsg.humans.clear();
-  classifiedHumansMsg.classified_humans.clear();
+  //humansMsg.humans.clear();
+  //classifiedHumansMsg.classified_humans.clear();
   pathPlan.clear();
 }
 
@@ -720,9 +741,9 @@ void VectorDisplayThread::compileDisplay() {
   textInWindowCoords.clear();
 
   if (!blankDisplay) {
-    drawMap(&lines, &lineColors);
+    //drawMap(&lines, &lineColors);
   }
-
+  /*
   if (navMapMode || semanticMapMode || navViewMode) {
     VectorDisplay::Color roomLabel(0.0, 0.0, 0.0, 1.0);
     const vector<Vertex>& vertices = navMap.Vertices;
@@ -751,8 +772,8 @@ void VectorDisplayThread::compileDisplay() {
                                           Vector2f(V2COMP(vertices[v2].loc))));
       lineColors.push_back(VectorDisplay::Color(0xFFFF00FF));
     }
-  }
-
+  }*/
+/*
   if (semanticViewMode) {
     // TODO -- fix logic so we don't need this repeated code?
     VectorDisplay::Color roomLabel(0.0, 0.0, 0.0, 1.0);
@@ -774,7 +795,7 @@ void VectorDisplayThread::compileDisplay() {
       lines.push_back(VectorDisplay::Line(p0, p1));
       lineColors.push_back(VectorDisplay::Color(0x7F404040));
     }
-  }
+  }*/
 
   if (showAnomalyProb && (anomaly != 0.0)) {
     printf("ll: (%f,%f), ur: (%f,%f), anomaly: %f\n",anomalyLLX,anomalyLLY,
@@ -792,6 +813,7 @@ void VectorDisplayThread::compileDisplay() {
   }
 
   // Draw humans detected.
+  /*
   if (GetTimeSec()-tHumanDetect < MessageTimeout) {
     for (size_t i = 0; i < humansMsg.humans.size(); ++i) {
       const Vector2f human_local(
@@ -810,8 +832,10 @@ void VectorDisplayThread::compileDisplay() {
       lineColors.push_back(kHumansColor);
    }
   }
-
+  */
+  
   // Draw humans classified.
+  /*
   static const float kHumanBoxSize = 0.35;
   if (GetTimeSec()-tHumanTrack < MessageTimeout) {
     for (size_t i = 0; i < classifiedHumansMsg.classified_humans.size(); ++i) {
@@ -844,7 +868,7 @@ void VectorDisplayThread::compileDisplay() {
       lineColors.push_back(color);
       lineColors.push_back(color);
     }
-  }
+  }*/
 
   for (unsigned int j = 0; j < displayMsgs.size(); j++) {
     const LidarDisplayMsg& displayMsg = displayMsgs[j];
@@ -1055,7 +1079,7 @@ void VectorDisplayThread::run() {
           runApp?1:0, ros::ok()?1:0);
     }
   } else {
-    vectorMap = VectorMap(map_name_, mapsFolder.c_str(), false);
+    //vectorMap = VectorMap(map_name_, mapsFolder.c_str(), false);
 
     ros::Subscriber guiSub;
     ros::Subscriber statusSub;
@@ -1067,19 +1091,19 @@ void VectorDisplayThread::run() {
     ros::Subscriber humansSub;
     ros::Subscriber classifiedHumansSub;
 
-    humansSub = node_handle_->subscribe(
-        "Cobot/HumanDetect/Humans", 1,
-        &VectorDisplayThread::humanDetectionCallback, this);
-    classifiedHumansSub = node_handle_->subscribe(
-        "/Cobot/HumanDetect/ClassifiedHumans", 1,
-        &VectorDisplayThread::humanTrackingCallback, this);
+    //humansSub = node_handle_->subscribe(
+    //    "Cobot/HumanDetect/Humans", 1,
+    //    &VectorDisplayThread::humanDetectionCallback, this);
+    //classifiedHumansSub = node_handle_->subscribe(
+    //    "/Cobot/HumanDetect/ClassifiedHumans", 1,
+    //    &VectorDisplayThread::humanTrackingCallback, this);
     statusSub = node_handle_->subscribe(
         "Cobot/Status", 1, &VectorDisplayThread::cobotStatusCallback, this);
     laserSub = node_handle_->subscribe(
         "Cobot/Laser", 1, &VectorDisplayThread::laserCallback, this);
-    localizationSub = node_handle_->subscribe(
-        "Cobot/Localization", 1,
-        &VectorDisplayThread::cobotLocalizationCallback, this);
+    //localizationSub = node_handle_->subscribe(
+    //    "Cobot/Localization", 1,
+    //    &VectorDisplayThread::cobotLocalizationCallback, this);
     anomalySub =node_handle_->subscribe(
         "Cobot/ExecutionMonitor/AnomalyMonitorRect",
         1, &VectorDisplayThread::cobotAnomalyCallback, this);
@@ -1115,7 +1139,7 @@ void VectorDisplayThread::run() {
 void VectorDisplayThread::setOptions(
     bool testMode, string mapName, bool saveLocs, bool liveView,
     bool persistentDisplay, bool saveOrientations, bool blankDisplay,
-    float maxFps, bool mapEditMode, bool navMapMode, bool semanticMapMode,
+    float maxFps, bool mapEditMode, bool semanticMapMode,
     bool semanticViewMode, bool navViewMode, bool viewVectorFile) {
 
   this->testMode = testMode;
@@ -1127,19 +1151,19 @@ void VectorDisplayThread::setOptions(
   this->saveOrientations = saveOrientations;
   this->maxFps = maxFps;
   this->mapEditMode = mapEditMode;
-  this->navMapMode = navMapMode;
+  //this->navMapMode = navMapMode;
   this->semanticMapMode = semanticMapMode;
   this->semanticViewMode = semanticViewMode;
   this->navViewMode = navViewMode;
   this->viewVectorFile = viewVectorFile;
-  if (navMapMode || semanticMapMode || navViewMode) {
-    display->SetPrimitivesSizes(3.0, 1.5);
-  }
-  if (navMapMode || navViewMode) {
-    navMap.LoadMap(map_name_);
-  } else if (semanticMapMode || semanticViewMode) {
-    navMap.LoadSemanticMap(map_name_);
-  }
+  //if (navMapMode || semanticMapMode || navViewMode) {
+  //  display->SetPrimitivesSizes(3.0, 1.5);
+  //}
+  //if (navMapMode || navViewMode) {
+  //  navMap.LoadMap(map_name_);
+  //} else if (semanticMapMode || semanticViewMode) {
+  //  navMap.LoadSemanticMap(map_name_);
+  //}
   if (saveLocs) {
     saveLocsFile = new ScopedFile("savedLocs.txt", "aw");
   }
@@ -1148,12 +1172,11 @@ void VectorDisplayThread::setOptions(
 VectorDisplayThread::VectorDisplayThread(
     const std::string& _mapsFolder, VectorDisplay* disp,
     ros::NodeHandle* node_handle, QApplication* qapp, QObject* parent) :
-    node_handle_(node_handle), app(qapp), display(disp), navMap(_mapsFolder),
-    vectorMap(_mapsFolder), saveLocsFile(NULL) {
+    node_handle_(node_handle), app(qapp), display(disp), saveLocsFile(NULL) {
   autoUpdateMap = true;
   runApp = true;
   mapEditMode = false;
-  navMapMode = false;
+  //navMapMode = false;
   semanticMapMode = false;
   semanticViewMode = false;
   clearDisplay = false;
@@ -1167,7 +1190,7 @@ VectorDisplayThread::VectorDisplayThread(
   tHumanDetect = 0.0;
   tHumanTrack = 0.0;
   this->setOptions(false, "GHC7", false, false, true, false, false, 60.0,
-                   false, false, false, false, false, false);
+                   false, false, false, false, false);
   mapsFolder = _mapsFolder;
   pathPlan.clear();
   localizationInitMsg.header.seq = 0;
@@ -1185,13 +1208,15 @@ VectorDisplayThread::~VectorDisplayThread() {
   if (saveLocsFile != NULL) {
     delete saveLocsFile;
   }
+/*
   if (mapEditMode) {
     if (vectorMap.saveMap(map_name_)) {
       printf("Saved map %s\n", map_name_.c_str());
     } else {
       printf("Error saving map %s\n", map_name_.c_str());
     }
-  }
+  }*/
+/*
   if (navMapMode) {
     if (navMap.SaveMap(map_name_)) {
       printf("Saved navigation map %s\n", map_name_.c_str());
@@ -1205,6 +1230,6 @@ VectorDisplayThread::~VectorDisplayThread() {
     } else {
       printf("Error saving semantic map %s\n", map_name_.c_str());
     }
-  }
+  }*/
   fflush(stdout);
 }
