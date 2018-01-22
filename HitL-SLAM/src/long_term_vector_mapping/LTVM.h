@@ -1,0 +1,6 @@
+class LongTermVectorMap {
+  public:
+
+  private:
+
+};

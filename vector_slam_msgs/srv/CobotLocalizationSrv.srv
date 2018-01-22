@@ -1,0 +1,12 @@
+# The following parameters are used to set the 2D location and orientation
+float32 x
+float32 y
+float32 angle
+string map
+
+---
+
+float32 x
+float32 y
+float32 angle
+string map

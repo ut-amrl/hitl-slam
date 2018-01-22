@@ -1,0 +1,24 @@
+float64 timeStamp
+float32 x
+float32 y
+float32 angle
+float32 angleUncertainty
+float32 locationUncertainty
+string map
+
+float64 lastLaserRunTime
+float64 laserRunTime
+int32 laserNumObservedPoints
+int32 laserNumCorrespondences
+float32 laserStage0Weights
+float32 laserStageRWeights
+float32 laserMeanSqError
+
+float64 lastPointCloudRunTime
+float64 pointCloudRunTime
+int32 pointCloudNumObservedPoints
+int32 pointCloudNumCorrespondences
+float32 pointCloudStage0Weights
+float32 pointCloudStageRWeights
+float32 pointCloudMeanSqError
+

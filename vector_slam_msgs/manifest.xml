@@ -1,0 +1,20 @@
+<package>
+  <description brief="cobot_msgs">
+
+     Messages and Services of CoBot Software stack
+
+  </description>
+  <author>Joydeep Biswas</author>
+  <license>LGPLv3.0</license>
+  <review status="unreviewed" notes=""/>
+  <url></url>
+  <depend package="std_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="rospy"/>
+  <depend package="roscpp"/>
+  <build_depend>message_generation</build_depend>
+  <run_depend>message_runtime</run_depend>
+</package>
+
+

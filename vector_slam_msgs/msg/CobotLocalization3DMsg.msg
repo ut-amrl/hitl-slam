@@ -1,0 +1,10 @@
+float64 timeStamp
+float32 x
+float32 y
+float32 z
+float32 angle_w
+float32 angle_x
+float32 angle_y
+float32 angle_z
+float32 conf
+string map

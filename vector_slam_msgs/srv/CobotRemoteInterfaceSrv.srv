@@ -1,0 +1,42 @@
+
+# "Joystick" velocity commands:
+float32 drive_x #Distance to move along x in meters
+float32 drive_y #Distance to move along y in meters
+float32 drive_r #Distance to turn in radians
+float32 max_vel_trans # Maximum Translation Velocity
+float32 max_vel_rot #Maximum Rotation Velocity
+
+# command_num must increment every time the service is called - used to reject out of sync commands
+int32 command_num
+
+# valid command flags:
+#   CmdMove = 0x0001
+#   CmdSetLocation = 0x0002
+#   CmdGetLocation = 0x0004
+#   CmdGetParticlesSampling = 0x0010
+#   CmdSetTarget = 0x0020
+#   CmdMoveNoObstAvoid = 0x0040
+#   CmdInterrupt = 0x0080
+#   CmdResume = 0x0100
+int32 command_type
+
+# The following parameters are used for commands CmdSetLocation and CmdSetTarget
+float32 loc_x
+float32 loc_y
+float32 orientation
+float32 distance_tolerance
+float32 angle_tolerance
+string map
+
+---
+
+float32 loc_x
+float32 loc_y
+float32 orientation
+
+float32[] particles_x
+float32[] particles_y
+float32[] particles_weight
+float32[] locations_weight
+
+int8 err_code
