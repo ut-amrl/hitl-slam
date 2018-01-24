@@ -205,13 +205,13 @@ int main(int argc, char *argv[]) {
   ros::NodeHandle node_handle;
   mouse_move_publisher_ =
       node_handle.advertise<vector_slam_msgs::GuiMouseMoveEvent>(
-      "Cobot/VectorLocalization/GuiMouseMoveEvents", 1, false);
+      "VectorSLAM/VectorLocalization/GuiMouseMoveEvents", 1, false);
   mouse_click_publisher_ =
       node_handle.advertise<vector_slam_msgs::GuiMouseClickEvent>(
-      "Cobot/VectorLocalization/GuiMouseClickEvents", 1, false);
+      "VectorSLAM/VectorLocalization/GuiMouseClickEvents", 1, false);
   keyboard_events_publisher_ =
       node_handle.advertise<vector_slam_msgs::GuiKeyboardEvent>(
-      "Cobot/VectorLocalization/GuiKeyboardEvents", 1, false);
+      "VectorSLAM/VectorLocalization/GuiKeyboardEvents", 1, false);
   capture_service_ = node_handle.advertiseService(
       "VectorLocalization/Capture", CaptureCallback);
 

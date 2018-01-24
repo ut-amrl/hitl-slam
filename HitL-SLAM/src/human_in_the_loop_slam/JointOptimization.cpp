@@ -110,6 +110,7 @@ static const size_t kDynamicDiffStride = 4;
 // The path of the cobot_linux ROS stack.
 //static const string kCobotStackPath(ros::package::getPath("cobot_linux"));
 
+//TODO: disentangle this file from old code
 
 
 // Config reader for localization options.
@@ -766,19 +767,26 @@ void JointOpt::AddOdometryConstraints(ceres::Problem* problem) {
       axis_transform.block<1, 2>(1, 0) = tangential_direction.transpose();
       radial_translation = translation.norm();
     }
-    const float radial_std_dev = bound<float>(
+    const float radial_std_dev = 0.03;
+
+      /* bound<float>(
         localization_options_.kOdometryRadialStdDevRate * radial_translation,
         localization_options_.kOdometryTranslationMinStdDev,
-        localization_options_.kOdometryTranslationMaxStdDev);
-    const float tangential_std_dev = bound<float>(
+        localization_options_.kOdometryTranslationMaxStdDev);*/
+    const float tangential_std_dev = 0.03;
+
+       /* bound<float>(
         localization_options_.kOdometryTangentialStdDevRate *
         radial_translation,
         localization_options_.kOdometryTranslationMinStdDev,
-        localization_options_.kOdometryTranslationMaxStdDev);
-    const float angular_std_dev = bound<float>(
+        localization_options_.kOdometryTranslationMaxStdDev);*/
+    const float angular_std_dev = 0.01;
+
+
+       /* bound<float>(
         localization_options_.kOdometryAngularStdDevRate * fabs(rotation),
         localization_options_.kOdometryAngularMinStdDev,
-        localization_options_.kOdometryAngularMaxStdDev);
+        localization_options_.kOdometryAngularMaxStdDev);*/
     
 //     std::cout << localization_options_.kOdometryAngularMinStdDev << " ::: "
 //               << angular_std_dev << " ::: "

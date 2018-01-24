@@ -1108,7 +1108,7 @@ void VectorDisplayThread::run() {
         "Cobot/ExecutionMonitor/AnomalyMonitorRect",
         1, &VectorDisplayThread::cobotAnomalyCallback, this);
     guiSub = node_handle_->subscribe(
-        "Cobot/VectorLocalization/Gui", 1,
+        "VectorSLAM/VectorLocalization/Gui", 1,
         &VectorDisplayThread::statusCallback, this);
     kinectScanSub = node_handle_->subscribe(
         "Cobot/Kinect/Scan", 1,

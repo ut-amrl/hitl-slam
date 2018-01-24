@@ -367,22 +367,24 @@ bool LoadConfiguration(VectorMapping::VectorMappingOptions* options) {
 //Load point clouds into ROBOT FRAME
 void loadPoseGraph(bool placeholder_for_existing_loop_closure_constraints,
                    vector<Pose2Df>* odometry_ptr,
-                   vector<PointCloudf>* point_cloud_ptr,
-                   vector<NormalCloudf>* normal_cloud_ptr, 
+                   vector<PointCloudf>* point_clouds_ptr,
+                   vector<NormalCloudf>* normal_clouds_ptr, 
                    vector<Pose2Df>* poses_ptr,
                    vector<Matrix3f>* covariances_ptr) {
 
-  vector<PointCloudf> point_clouds = *point_cloud_ptr;
-  vector<NormalCloudf> normal_clouds = *normal_cloud_ptr;
-  vector<Pose2Df> poses = *poses_ptr;
-  vector<Matrix3f> covariances = *covariances_ptr;
+  //vector<PointCloudf> point_clouds = *point_cloud_ptr;
+  //vector<NormalCloudf> normal_clouds = *normal_cloud_ptr;
+  //vector<Pose2Df> poses = *poses_ptr;
+  //vector<Matrix3f> covariances = *covariances_ptr;
+  //TODO read odometry
   PointCloudf single_point_cloud;
   NormalCloudf single_normal_cloud;
   
-  CHECK_EQ(point_clouds.size(),0);
-  CHECK_EQ(normal_clouds.size(),0);
-  CHECK_EQ(poses.size(),0);
-  CHECK_EQ(covariances.size(),0);
+  CHECK_EQ(point_clouds_ptr->size(),0);
+  CHECK_EQ(normal_clouds_ptr->size(),0);
+  //CHECK_EQ(poses.size(),0);
+  CHECK_EQ(poses_ptr->size(),0);
+  CHECK_EQ(covariances_ptr->size(),0);
   
   ScopedFile fid(pose_graph_file_, "r");
   if(fid() == NULL) {
@@ -395,43 +397,60 @@ void loadPoseGraph(bool placeholder_for_existing_loop_closure_constraints,
   Vector2f normal(0, 0);
   Pose2Df pose(0, 0, 0);
   Matrix3f one_cov = Matrix3f::Zero();
-  
-
+ 
+  char map_name_str[64];
+  double timestamp;
+ 
+  if (fscanf(fid(), "%s\n", map_name_str) != 1) {
+    fprintf(stderr, "ERROR: Unable to read map name.\n");
+    exit(1);
+  }
+  if (fscanf(fid(), "%lf\n", &timestamp) != 1) {
+    fprintf(stderr, "ERROR: Unable to read map timeStamp.\n");
+    exit(1);
+  }
 
 
   //TODO: need to add original odom
 
   //TODO: maybe this can be done better
 
-  while (fscanf(fid(), "%f,%f,%f, %f,%f, %f,%f,"
-                       "%f,%f,%f,%f,%f,%f,%f,%f,%f,\n",
+  while (fscanf(fid(), "%f,%f,%f,%f,%f, %f,%f,"
+                       "%f, %f, %f, %f, %f, %f, %f, %f, %f\n",
     &(pose.translation.x()), &(pose.translation.y()), &(pose.angle),
     &(point.x()), &(point.y()), &(normal.x()), &(normal.y()),
     &(one_cov(0,0)), &(one_cov(0,1)), &(one_cov(0,2)),
     &(one_cov(1,0)), &(one_cov(1,1)), &(one_cov(1,2)),
     &(one_cov(2,0)), &(one_cov(2,1)), &(one_cov(2,2))) == kNumFields) {
 
-    if (poses.size() == 0) {
-      poses.push_back(pose);
+    //if (poses.size() == 0) {
+    if (poses_ptr->size() == 0) {
+      //poses.push_back(pose);
+      poses_ptr->push_back(pose);
       //cout << covariances.size() << "\n" << one_cov << endl;
-      covariances.push_back(one_cov);
+      covariances_ptr->push_back(one_cov);
       single_point_cloud.push_back(point);
       single_normal_cloud.push_back(normal);
     }
-    else if (pose.translation != poses[poses.size()-1].translation ||
-             pose.angle != poses[poses.size()-1].angle) {
-      const Rotation2Df R(-poses[poses.size()-1].angle);
-      const Vector2f pose_location = -poses[poses.size()-1].translation;
+    //else if (pose.translation != poses.back().translation ||
+    //         pose.angle != poses.back().angle) {
+    else if (pose.translation != poses_ptr->back().translation ||
+             pose.angle != poses_ptr->back().angle) {
+      //const Rotation2Df R(-poses.back().angle);
+      const Rotation2Df R(-poses_ptr->back().angle);
+      //const Vector2f pose_location = -poses.back().translation;
+      const Vector2f pose_location = -poses_ptr->back().translation;
       for (size_t i = 0; i < single_point_cloud.size(); i++) {
           single_point_cloud[i] = R*(single_point_cloud[i] + pose_location);
           single_normal_cloud[i] = R*(single_normal_cloud[i] + pose_location);
       }
-      point_clouds.push_back(single_point_cloud);
-      normal_clouds.push_back(single_normal_cloud);
+      point_clouds_ptr->push_back(single_point_cloud);
+      normal_clouds_ptr->push_back(single_normal_cloud);
       single_point_cloud.clear();
       single_normal_cloud.clear();
-      poses.push_back(pose);
-      covariances.push_back(one_cov);
+      //poses.push_back(pose);
+      poses_ptr->push_back(pose);
+      covariances_ptr->push_back(one_cov);
       single_point_cloud.push_back(point);
       single_normal_cloud.push_back(normal);
     }
@@ -441,15 +460,19 @@ void loadPoseGraph(bool placeholder_for_existing_loop_closure_constraints,
     }
   }
   if (single_point_cloud.size() != 0) {
-    const Rotation2Df R(-poses[poses.size()-1].angle);
-    const Vector2f pose_location = -poses[poses.size()-1].translation;
+    //const Rotation2Df R(-poses.back().angle);
+    const Rotation2Df R(-poses_ptr->back().angle);
+    //const Vector2f pose_location = -poses.back().translation;
+    const Vector2f pose_location = -poses_ptr->back().translation;
     for (size_t i = 0; i < single_point_cloud.size(); i++) {
       single_point_cloud[i] = R*(single_point_cloud[i] + pose_location);
       single_normal_cloud[i] = R*(single_normal_cloud[i] + pose_location);
     }
-    point_clouds.push_back(single_point_cloud);
-    normal_clouds.push_back(single_normal_cloud);
+    point_clouds_ptr->push_back(single_point_cloud);
+    normal_clouds_ptr->push_back(single_normal_cloud);
   }
+  //cout << "lpg poses size: " << poses.size() << endl;
+  cout << "lpg poses size: " << poses_ptr->size() << endl;
 }
 
 
@@ -480,6 +503,8 @@ void DisplayPoses() {
   vector<Matrix3f> covariances = hitl_slam_session_.getCovariances();
   vector<PointCloudf> point_clouds = hitl_slam_session_.getWorldFrameScans();
   
+  cout << "sizes: " << poses.size() << " " << covariances.size() << " " << point_clouds.size() << endl;
+
   CHECK_EQ(poses.size(), point_clouds.size());
   CHECK_GT(poses.size(), 0);
 
@@ -1126,6 +1151,7 @@ void KeyboardRequestCallback(const vector_slam_msgs::GuiKeyboardEvent& msg) {
     cout << "In correction mode: " << correction_mode_on_ << endl;
     if (!correction_mode_on_) {
       hitl_slam_session_.Run();
+      DisplayPoses();
     }
   }
   //TODO finish
@@ -1302,7 +1328,10 @@ int main(int argc, char** argv) {
     
     loadPoseGraph(true, &odom, &rob_frame_pcs, &norm_clouds, &poses, &covars);
 
+    cout << "poses size: " << poses.size() << endl;
     hitl_slam_session_.init(odom, rob_frame_pcs, norm_clouds, covars, poses);
+
+    DisplayPoses();
   }
   else if (log_file_ != NULL) {
     cout << "got log file" << endl;
