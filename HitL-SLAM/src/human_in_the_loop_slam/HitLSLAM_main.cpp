@@ -1258,7 +1258,7 @@ int main(int argc, char** argv) {
 
 
   // Node setup
-  string node_name = "Human-in-the-Loop SLAM";
+  string node_name = "HitL";
   ros::init(argc, argv, node_name, ros::init_options::NoSigintHandler);
   ros::NodeHandle ros_node;
 
