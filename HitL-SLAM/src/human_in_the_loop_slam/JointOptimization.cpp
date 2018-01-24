@@ -17,7 +17,7 @@
 //
 // Implementation of non-Markov Localization.
 
-#include "../../vmapping/vector_mapping.h"
+//#include "../../vmapping/vector_mapping.h"
 
 #include <dirent.h>
 #include <errno.h>
@@ -41,7 +41,7 @@
 
 #include "ceres/ceres.h"
 #include "ceres/dynamic_autodiff_cost_function.h"
-#include "../../map/vector_map.h"
+//#include "../../map/vector_map.h"
 #include "../../perception_tools/perception_2d.h"
 #include "../../shared/math/eigen_helper.h"
 #include "../../shared/math/util.h"

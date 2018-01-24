@@ -72,16 +72,16 @@ using Eigen::Matrix2d;
 using Eigen::Matrix2f;
 using Eigen::Matrix3d;
 using Eigen::Matrix3f;
-using Eigen::Perp2;
+//using Eigen::Perp2;
 using Eigen::Rotation2Dd;
 using Eigen::Rotation2Df;
-using Eigen::ScalarCross;
+//using Eigen::ScalarCross;
 using Eigen::Translation2d;
 using Eigen::Translation2f;
 using Eigen::Vector2d;
 using Eigen::Vector2f;
 using Eigen::Vector3d;
-using Eigen::DistanceToLineSegment;
+//using Eigen::DistanceToLineSegment;
 using perception_2d::GenerateNormals;
 using perception_2d::NormalCloudf;
 using perception_2d::PointCloudf;
@@ -95,33 +95,30 @@ using std::sort;
 using std::string;
 using std::vector;
 
-// TODO: verify points for point corrections?
-//       what if user just double taps 'p'?
+// TODO: fix double - float mismatch with covariance matrices
 //       deal with reading from input log for replay
 //       get covar from ceres (JO)
-//       all viz bookkeeping 
-
-HitLSLAM::HitLSLAM() {}
+ 
 
 
 void HitLSLAM::init(const vector<Pose2Df> odom,
                     const vector<PointCloudf> rob_frame_pcs,
                     const vector<NormalCloudf> norm_clouds,
                     vector<Matrix3f> covars,
-                    vector<Pose2Df> poses)
-    : odometry_(odom),
-      prev_poses_(poses),
-      poses_(poses),
-      ROBOT_FRAME_point_clouds_(rob_frame_pcs),
-      normal_clouds_(norm_clouds),
-      prev_covariances_(covars),
-      curr_covariances_(covars) {
-  WORLD_FRAME_point_clouds_.resize(ROBOT_FRAME_point_clouds_);
-  for (size_t i=0; i<ROBOT_FRAME_point_clouds.size(); i++) {
-    WORLD_FRAME_point_clouds[i].resize(ROBOT_FRAME_point_clouds_[i]);
+                    vector<Pose2Df> poses) {
+
+  odometry_ = odom;
+  prev_poses_ = poses;
+  poses_ = poses;
+  ROBOT_FRAME_point_clouds_ = rob_frame_pcs;
+  normal_clouds_ = norm_clouds;
+  prev_covariances_ = covars;
+  covariances_ = covars;
+  WORLD_FRAME_point_clouds_.resize(ROBOT_FRAME_point_clouds_.size());
+  for (size_t i=0; i<ROBOT_FRAME_point_clouds_.size(); i++) {
+    WORLD_FRAME_point_clouds_[i].resize(ROBOT_FRAME_point_clouds_[i].size());
   }
   transformPointCloudsToWorldFrame();
-
 }
 
 std::vector<perception_2d::Pose2Df> HitLSLAM::getPoses() {
@@ -152,7 +149,7 @@ bool HitLSLAM::isValidCorrectionType(const CorrectionType& type) {
 void HitLSLAM::addCorrectionPoints(const uint32_t type,
                                    const Eigen::Vector2f mouse_down,
                                    const Eigen::Vector2f mouse_up) {
-  correction_type =  static_cast<CorrectionType>(type);
+  CorrectionType correction_type =  static_cast<CorrectionType>(type);
   if (correction_type != pending_correction_type_ &&
       isValidCorrectionType(correction_type)) { 
     const auto name_index = static_cast<size_t>(correction_type);
@@ -161,7 +158,7 @@ void HitLSLAM::addCorrectionPoints(const uint32_t type,
     selected_points_.clear();
     // All corrections need the first point.
     selected_points_.push_back(mouse_down);
-    if (correction_input_type != CorrectionType::kPointCorrection) {
+    if (correction_type != CorrectionType::kPointCorrection) {
       // Except for the point correction, all other corrections require
       // the second point.
       selected_points_.push_back(mouse_up);
@@ -219,9 +216,9 @@ size_t HitLSLAM::verifyUserInput() {
   bool seen;
   for (size_t i=0; i<selected_points_.size(); i++) {
     seen = false;
-    for (size_t j=0; j<WORLD_FRAME_point_clouds->size(); j++) {
-      for (size_t k=0; k<WORLD_FRAME_point_clouds[0][j].size(); k++) {
-        if ((WORLD_FRAME_point_clouds[0][j][k] - selected_points_[i]).norm() < local_select_thresh) {
+    for (size_t j=0; j<WORLD_FRAME_point_clouds_.size(); j++) {
+      for (size_t k=0; k<WORLD_FRAME_point_clouds_[j].size(); k++) {
+        if ((WORLD_FRAME_point_clouds_[j][k] - selected_points_[i]).norm() < local_select_thresh) {
           points_verified ++;
           seen = true;
           break;
@@ -240,16 +237,15 @@ size_t HitLSLAM::verifyUserInput() {
   return points_verified;
 }
 
-vector<PointCloudf> HitLSLAM::transformPointCloudsToWorldFrame() {
-  for (size_t i=0; i<ROBOT_FRAME_point_clouds.size(); i++) {
+void HitLSLAM::transformPointCloudsToWorldFrame() {
+  for (size_t i=0; i<ROBOT_FRAME_point_clouds_.size(); i++) {
     const Rotation2Df rotation(poses_[i].angle);
     const Translation2f translation(poses_[i].translation);
     const Affine2f pose_transform = translation * rotation;
-    for (size_t j=0; j < ROBOT_FRAME_point_clouds[i].size(); j++) {
-      WORLD_FRAME_point_clouds[i][j] = pose_transform * ROBOT_FRAME_point_clouds[i][j];
+    for (size_t j=0; j < ROBOT_FRAME_point_clouds_[i].size(); j++) {
+      WORLD_FRAME_point_clouds_[i][j] = pose_transform * ROBOT_FRAME_point_clouds_[i][j];
     }
   }
-
 }
 
 void HitLSLAM::resetCorrectionInputs() {
@@ -312,7 +308,7 @@ void HitLSLAM::replayFromLog(const vector<SingleInput> input_log) {
       backprop_.Run();
       
       covariances_ = backprop_.d3_covariances_;
-      poses = backprop_.poses_;
+      poses_ = backprop_.poses_;
 
       //ceres_gradients_.clear();
       //jacobian_init_ = false;

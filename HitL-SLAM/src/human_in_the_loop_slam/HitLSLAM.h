@@ -37,7 +37,7 @@ class HitLSLAM {
     bool isValidCorrectionType(const CorrectionType& type);
     size_t verifyUserInput();
     void resetCorrectionInputs();
-    std::vector<perception_2d::PointCloudf> transformPointCloudsToWorldFrame();    
+    void transformPointCloudsToWorldFrame();    
 
     // class which handles interpretation of user input
     EMInput em_input_;
@@ -59,7 +59,7 @@ class HitLSLAM {
     std::vector<perception_2d::NormalCloudf> normal_clouds_;
 
     // point clouds in world frame
-    std::vector<perception_2d::PointCloudf> WORLD_FRAME_points_clouds_;
+    std::vector<perception_2d::PointCloudf> WORLD_FRAME_point_clouds_;
     
     // pose estimates
     std::vector<perception_2d::Pose2Df> poses_;

@@ -34,7 +34,7 @@
 #include "../perception_tools/perception_2d.h"
 #include "pthread_utils.h"
 //#include "../map/vector_map.h"
-//#include "../vmapping/vector_mapping.h"
+#include "../episodic_non_markov_localization/vector_mapping.h"
 
 #include <CImg.h>
 
@@ -72,7 +72,7 @@ class JointOpt {
   std::vector<Eigen::Matrix3d> d3_covariances_;
  
   // vector of vectors of pose to pose constraints
-  std::vector<std::vector<VectorMapping::HumanConstraint>> human_constraints_;
+  std::vector<std::vector<HumanConstraint>> human_constraints_;
   
   // original relative odometry transforms
   //std::vector<perception_2d::Pose2Df> orig_odom_;
@@ -94,7 +94,7 @@ class JointOpt {
 
    void SetParams();
 
-   bool LoadConfiguration(VectorMapping::VectorMappingOptions* options);
+   //bool LoadConfiguration(VectorMapping::VectorMappingOptions* options);
 
    void ConvertPointClouds();
 
@@ -214,16 +214,16 @@ class JointOpt {
 
   // List of point to point constraints obtained by matching observed points
   // from overlapping poses.
-  std::vector<VectorMapping::PointToPointCorrespondence>
+  std::vector<vector_localization::VectorMapping::PointToPointCorrespondence>
                        point_point_correspondences_;
 
   // List of point to point constraints obtained by matching observed points
   // from overlapping poses.
-  std::vector<VectorMapping::PointToPointGlobCorrespondence>
+  std::vector<vector_localization::VectorMapping::PointToPointGlobCorrespondence>
                        point_point_glob_correspondences_;
 
   // List of point to point STF constraints.
-  std::vector<PointToPointConstraint*> point_point_constraints_;
+  std::vector<vector_localization::PointToPointConstraint*> point_point_constraints_;
 
   // Array containing the 3DOF poses being optimized.
   std::vector<double> pose_array_;
@@ -245,7 +245,7 @@ class JointOpt {
   std::vector<double> relative_pose_array_;
 
     // Options pertaining to non-Markov Localization.
-  VectorMapping::VectorMappingOptions localization_options_;
+  vector_localization::VectorMapping::VectorMappingOptions localization_options_;
 
   std::vector<Eigen::Vector2f> temp_inliers_;
 
