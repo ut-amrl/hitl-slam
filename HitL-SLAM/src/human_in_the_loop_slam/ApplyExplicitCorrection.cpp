@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <iostream>
 
 #include <algorithm>
 #include <cmath>
@@ -36,9 +37,11 @@
 #include <vector>
 #include <boost/concept_check.hpp>
 
+#include "human_constraints.h"
+
 //#include "ceres/ceres.h"
 //#include "ceres/dynamic_autodiff_cost_function.h"
-#include "../map/vector_map.h"
+//#include "../map/vector_map.h"
 #include "../perception_tools/perception_2d.h"
 #include "../shared/math/eigen_helper.h"
 #include "../shared/math/util.h"
@@ -47,7 +50,7 @@
 #include "../shared/util/timer.h"
 //#include "vector_localization/residual_functors.h"
 //#include <vectorparticlefilter.h>
-#include "../vmapping/vector_mapping.h"
+//#include "../vmapping/vector_mapping.h"
 // #define ENABLE_TIMING
 
 #ifdef ENABLE_TIMING
@@ -84,15 +87,15 @@ using std::pair;
 using std::size_t;
 using std::string;
 using std::vector;
-using vector_localization::CorrectionType;
-using vector_localization::CorrectionTypeNames;
+//using vector_localization::CorrectionType;
+//using vector_localization::CorrectionTypeNames;
 //using vector_localization::LTSConstraint;
 //using vector_localization::PointToLineConstraint;
 //using vector_localization::PoseConstraint;
 
 typedef Eigen::Translation<float, 2> Translation2Df;
 
-namespace vector_localization {
+//namespace vector_localization {
 
 AppExpCorrect::AppExpCorrect() {}
 
@@ -485,4 +488,4 @@ void AppExpCorrect::Run() {
   calculateConstraintTargets();
 }
 
-}  // namespace vector_localization
+//}  // namespace vector_localization

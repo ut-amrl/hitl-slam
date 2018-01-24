@@ -51,7 +51,7 @@ class Backprop {
   std::pair<int, int> backprop_bounds_;
 
   // 3x3 Covariance matrix for each pose.
-  std::vector<Eigen::Matrix3d> d3_covariances_;
+  std::vector<Eigen::Matrix3f> covariances_;
   
   // Poses of every node.
   std::vector<perception_2d::Pose2Df> poses_;

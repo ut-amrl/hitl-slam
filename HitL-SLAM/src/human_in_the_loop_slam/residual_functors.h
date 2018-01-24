@@ -41,14 +41,14 @@ Jet<T, N> fabs(const Jet<T, N>& f) {
   }
   return f;
 }
-
+/*
 template <typename T, int N> inline
 Jet<T, N> floor(const Jet<T, N>& f) {
   const T f_int = std::floor(f.a);
   const T f_total = f.a;
   return (f_int / f_total) * f;
 }
-
+*/
 }  // namespace ceres
 
 namespace {

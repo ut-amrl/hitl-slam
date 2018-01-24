@@ -40,7 +40,7 @@
 #include "ceres/ceres.h"
 #include "ceres/dynamic_autodiff_cost_function.h"
 //#include "map/vector_map.h"
-//#include "perception_tools/perception_2d.h"
+#include "../perception_tools/perception_2d.h"
 //#include "shared/math/eigen_helper.h"
 //#include "shared/math/util.h"
 //#include "shared/util/helpers.h"
@@ -49,6 +49,8 @@
 //#include "vector_localization/residual_functors.h"
 //#include <vectorparticlefilter.h>
 //#include "vector_mapping.h"
+
+#include "human_constraints.h"
 
 // #define ENABLE_TIMING
 
@@ -90,13 +92,13 @@ using std::pair;
 using std::size_t;
 using std::string;
 using std::vector;
-using vector_localization::CorrectionType;
-using vector_localization::CorrectionTypeNames;
+//using vector_localization::CorrectionType;
+//using vector_localization::CorrectionTypeNames;
 
 typedef Eigen::Translation<float, 2> Translation2Df;
 
 
-namespace vector_localization {
+//namespace vector_localization {
 
 EMInput::EMInput() {}
 
@@ -456,8 +458,8 @@ void EMInput::Run() {
   // Adjust theta for input lines. Write optimal fit into selected_points_.
   std::cout << "adjusting" << std::endl;
   AutomaticEndpointAdjustment();
-  if (correction_type_ != vector_localization::CorrectionType::kPointCorrection && 
-      correction_type_ != vector_localization::CorrectionType::kCornerCorrection) {
+  if (correction_type_ != CorrectionType::kPointCorrection && 
+      correction_type_ != CorrectionType::kCornerCorrection) {
     //backprop start is the anchor pose for COP-SLAM
     //inside OrderAndFilterUserInput(), the correct sequence for
     //selected_points_ is determined, and all globals related to human
@@ -469,4 +471,4 @@ void EMInput::Run() {
   }
 }
 
-}  // namespace vector_localization
+//}  // namespace vector_localization

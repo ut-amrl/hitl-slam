@@ -55,7 +55,7 @@ class JointOpt {
   // Clears the current list of poses and associated observations.
   void ClearPoses();
 
-  std::vector<Eigen::Matrix3d> GetPoseCovariances();
+  std::vector<Eigen::Matrix3f> GetPoseCovariances();
 
   std::vector<float> GetCeresCost();
   
@@ -69,7 +69,7 @@ class JointOpt {
   std::vector<perception_2d::NormalCloudf> robot_frame_normal_clouds_;
   
   // 3x3 Covariance matrix for each pose.
-  std::vector<Eigen::Matrix3d> d3_covariances_;
+  std::vector<Eigen::Matrix3f> covariances_;
  
   // vector of vectors of pose to pose constraints
   std::vector<std::vector<HumanConstraint>> human_constraints_;

@@ -36,7 +36,7 @@
 #include <vector>
 #include <boost/concept_check.hpp>
 
-#include "ros/package.h"
+//#include "ros/package.h"
 #include "../../shared/util/configreader.h"
 
 #include "ceres/ceres.h"
@@ -51,6 +51,8 @@
 //#include "vector_localization/residual_functors.h"
 //#include <vectorparticlefilter.h>
 #include "residual_functors.h"
+
+#include "human_constraints.h"
 
 #include "JointOptimization.h"
 //#include <libfreenect2/src/opencl_depth_packet_processor.cl>
@@ -91,8 +93,8 @@ using std::pair;
 using std::size_t;
 using std::string;
 using std::vector;
-using vector_localization::CorrectionType;
-using vector_localization::CorrectionTypeNames;
+//using vector_localization::CorrectionType;
+//using vector_localization::CorrectionTypeNames;
 //using vector_localization::LTSConstraint;
 //using vector_localization::PointToLineConstraint;
 //using vector_localization::PoseConstraint;
@@ -106,14 +108,18 @@ static const bool kUseRelativeConstraints = false;
 static const size_t kDynamicDiffStride = 4;
 
 // The path of the cobot_linux ROS stack.
-static const string kCobotStackPath(ros::package::getPath("cobot_linux"));
+//static const string kCobotStackPath(ros::package::getPath("cobot_linux"));
+
+
 
 // Config reader for localization options.
-ConfigReader config_((kCobotStackPath + "/").c_str());
+//ConfigReader config_((kCobotStackPath + "/").c_str());
 
 // Parameters used for relocalization.
 //VectorLocalization2D::LidarParams relocalization_lidar_params_;
 
+
+/*
 // Uncertainty of translation in the direction of travel.
 float kRadialTranslationUncertainty = 0.05;
 // Uncertainty of translation perpendicular to the direction of travel.
@@ -133,12 +139,9 @@ float kAngularMargin = 0.0;
 float kMinPointCloudRange = 0.2;
 // Maximum distance of observed points from the robot.
 float kMaxPointCloudRange = 6.0;
+*/
 
-
-void SetSolverOptions(
-    const vector_localization::VectorMappingOptions&
-        localization_options,
-    ceres::Solver::Options* options_ptr) {
+void SetSolverOptions(ceres::Solver::Options* options_ptr) {
   ceres::Solver::Options& solver_options = *options_ptr;
 
   solver_options.linear_solver_type = ceres::SPARSE_SCHUR;
@@ -147,16 +150,17 @@ void SetSolverOptions(
 
   // solver_options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
   solver_options.minimizer_progress_to_stdout = false;
-  solver_options.num_threads = localization_options.kNumThreads;
-  solver_options.num_linear_solver_threads = localization_options.kNumThreads;
-  solver_options.max_num_iterations =
-      localization_options.max_solver_iterations;
+  //solver_options.num_threads = localization_options.kNumThreads;
+  //solver_options.num_linear_solver_threads = localization_options.kNumThreads;
+  //solver_options.max_num_iterations =
+  //    localization_options.max_solver_iterations;
   solver_options.function_tolerance = 0.000001;
   // solver_options.initial_trust_region_radius = 0.5;
   // solver_options.max_trust_region_radius = 2.0;
   solver_options.update_state_every_iteration = true;
 }
 
+/*
 class SRLCallback : public ceres::IterationCallback {
  public:
   SRLCallback(const vector<double>& poses,
@@ -195,15 +199,17 @@ class SRLCallback : public ceres::IterationCallback {
       const NormalCloudf& normal_cloud,
       const vector<LTSConstraint*>& constraints);
 };
-
+*/
 
 }  // namespace
 
-namespace vector_localization {
+//namespace vector_localization {
 
 JointOpt::JointOpt() {}
 JointOpt::~JointOpt() {}
 
+
+/*
 bool JointOpt::LoadConfiguration(VectorMappingOptions* options) {
   if (!config_.readFiles()) return false;
 
@@ -284,6 +290,7 @@ bool JointOpt::LoadConfiguration(VectorMappingOptions* options) {
 
   return !error;
 }
+*/
 
 Affine2f JointOpt::RelativePoseTransform(
     unsigned int source, unsigned int target) {
@@ -327,8 +334,8 @@ class PoseToObjectConstraint : public ceres::SizedCostFunction<1, 3, 3> {
   const size_t instance_id_;
 };*/
 
-vector<Matrix3d> JointOpt::GetPoseCovariances() {
-  return d3_covariances_;
+vector<Matrix3f> JointOpt::GetPoseCovariances() {
+  return covariances_;
 }
 
 vector< float > JointOpt::GetCeresCost() {
@@ -426,11 +433,11 @@ void JointOpt::FindVisualOdometryCorrespondences(int min_poses, int max_poses) {
   const size_t poses_end = min(
       static_cast<size_t>(max_poses + 1), point_clouds_g_.size());
   if (int(poses_end) < min_poses + 1) return;
-  vector<vector<PointToPointCorrespondence>>
+  vector<vector<vector_localization::VectorMapping::PointToPointCorrespondence>>
                    pose_correspondences(poses_end - min_poses - 1);
   //OMP_PARALLEL_FOR
   for (size_t i = min_poses; i < poses_end - 1; ++i) {
-    PointToPointCorrespondence correspondence;
+    vector_localization::VectorMapping::PointToPointCorrespondence correspondence;
     correspondence.source_pose = i;
     correspondence.target_pose = i + 1;
     Affine2f source_to_target_tf = RelativePoseTransform(i, i + 1);
@@ -532,7 +539,7 @@ void JointOpt::AddSTFConstraints(ceres::Problem* problem) {
   TIME_FUNCTION
   cout << "stfs size: " << point_point_glob_correspondences_.size() << endl;
   for (size_t i = 0; i < point_point_glob_correspondences_.size(); ++i) {
-    PointToPointGlobCorrespondence& correspondence =
+    vector_localization::VectorMapping::PointToPointGlobCorrespondence& correspondence =
         point_point_glob_correspondences_[i];
 
     DCHECK_NE(correspondence.pose_index0, correspondence.pose_index1);
@@ -559,7 +566,7 @@ void JointOpt::FindSTFCorrespondences(
   const size_t poses_end = min(
       static_cast<size_t>(max_poses + 1), point_clouds_g_.size());
   CHECK_GT(pose_array_.size(), poses_end - 1);
-  vector<vector<PointToPointGlobCorrespondence>>
+  vector<vector<vector_localization::VectorMapping::PointToPointGlobCorrespondence>>
 pose_point_correspondences(
       poses_end - min_poses);
   point_point_glob_correspondences_.clear();
@@ -571,7 +578,7 @@ pose_point_correspondences(
     //     pose_array_[3 * i], pose_array_[3 * i + 1]);
     for (size_t j = min_poses ; j < poses_end; j += kPointMatchSeparation) {
       if (i == j) continue;
-      PointToPointGlobCorrespondence correspondence;
+      vector_localization::VectorMapping::PointToPointGlobCorrespondence correspondence;
       vector<size_t> source_point_indices;
       correspondence.pose_index0 = i;
       correspondence.pose_index1 = j;
@@ -726,7 +733,7 @@ pose_point_correspondences(
 
 
 void JointOpt::AddOdometryConstraints(ceres::Problem* problem) {
-  static const bool debug = false;
+  //static const bool debug = false;
   TIME_FUNCTION
   static const float kEpsilon = 1e-6;
   
@@ -962,7 +969,7 @@ void JointOpt::AddHumanConstraints(ceres::Problem* problem) {
       HumanConstraint constraint = human_constraints_[i][j];
       info_mat_[0](constraint.anchor_pose_id, constraint.constrained_pose_id) = 255.0;
       info_mat_[0](constraint.constrained_pose_id, constraint.anchor_pose_id) = 255.0;
-      if (constraint.constraint_type == vector_localization::CorrectionType::kLineSegmentCorrection) {
+      if (constraint.constraint_type == CorrectionType::kLineSegmentCorrection) {
         Eigen::Vector2f anchor_pose_loc = poses_[constraint.anchor_pose_id].translation;
         float anchor_pose_angle = poses_[constraint.anchor_pose_id].angle;
         Eigen::Vector2f para_dir = Eigen::Vector2f(cos(anchor_pose_angle), sin(anchor_pose_angle));
@@ -985,7 +992,7 @@ void JointOpt::AddHumanConstraints(ceres::Problem* problem) {
                                                    &(pose_array_[3 * constraint.constrained_pose_id]));
         num_hc_residuals_ += 3;
       }
-      else if (constraint.constraint_type == vector_localization::CorrectionType::kColinearCorrection) {
+      else if (constraint.constraint_type == CorrectionType::kColinearCorrection) {
         Eigen::Vector2f anchor_pose_loc = poses_[constraint.anchor_pose_id].translation;
         float anchor_pose_angle = poses_[constraint.anchor_pose_id].angle;
         Eigen::Vector2f para_dir = Eigen::Vector2f(cos(anchor_pose_angle), sin(anchor_pose_angle));
@@ -1005,7 +1012,7 @@ void JointOpt::AddHumanConstraints(ceres::Problem* problem) {
                                                  &(pose_array_[3 * constraint.constrained_pose_id]));
         num_hc_residuals_ += 2;
       }
-      else if (constraint.constraint_type == vector_localization::CorrectionType::kPerpendicularCorrection) {
+      else if (constraint.constraint_type == CorrectionType::kPerpendicularCorrection) {
         float anchor_pose_angle = poses_[constraint.anchor_pose_id].angle;
         float t_angle = anchor_pose_angle + constraint.delta_angle;
         float target_angle = atan2(sin(t_angle), cos(t_angle));
@@ -1015,7 +1022,7 @@ void JointOpt::AddHumanConstraints(ceres::Problem* problem) {
                                                    &(pose_array_[3 * constraint.constrained_pose_id + 2]));
         num_hc_residuals_ += 1;
       }
-      else if (constraint.constraint_type == vector_localization::CorrectionType::kParallelCorrection) {
+      else if (constraint.constraint_type == CorrectionType::kParallelCorrection) {
         float anchor_pose_angle = poses_[constraint.anchor_pose_id].angle;
         float t_angle = anchor_pose_angle + constraint.delta_angle;
         float target_angle = atan2(sin(t_angle), cos(t_angle));
@@ -1132,14 +1139,14 @@ ceres::TerminationType JointOpt::SolveHumanConstraints() {
 ceres::TerminationType JointOpt::PostHumanOptimization(int min_pose,
                                                        int max_pose) {
   FunctionTimer timer(__FUNCTION__);
-  float odom_std_dev_weight = 1.0;
+  //float odom_std_dev_weight = 1.0;
 
   timer.Lap(__LINE__);
   cout << "Performing post-HiTL optimization\n";
   ceres::Solver::Options solver_options;
   //solver_options.min_relative_decrease = 0.00001;
 
-  SetSolverOptions(localization_options_, &solver_options);
+  SetSolverOptions(&solver_options);
   solver_options.minimizer_progress_to_stdout = true;
   solver_options.max_num_iterations = 100;
   // this time add STF constraints
@@ -1270,12 +1277,12 @@ void JointOpt::WriteCorrespondences() {
 
 void JointOpt::Run() {
   // WatchFiles to track changes to config files.
-  WatchFiles watch_files_;
-  config_.init(watch_files_);
-  config_.addFile("../robot.cfg");
-  config_.addFile("config/vector_mapping.cfg");
-  config_.addFile("config/localization_parameters.cfg");
-  CHECK(LoadConfiguration(&localization_options_));
+  //WatchFiles watch_files_;
+  //config_.init(watch_files_);
+  //config_.addFile("../robot.cfg");
+  //config_.addFile("config/vector_mapping.cfg");
+  //config_.addFile("config/localization_parameters.cfg");
+  //CHECK(LoadConfiguration(&localization_options_));
 
   ConvertPointClouds();
   CopyTempLaserScans();
@@ -1359,4 +1366,4 @@ void JointOpt::Run() {
 
 }
 
-}  // namespace vector_localization
+//}  // namespace vector_localization

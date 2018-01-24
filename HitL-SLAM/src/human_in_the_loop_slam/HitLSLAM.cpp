@@ -41,7 +41,7 @@
 
 //#include "eigen_helper.h"
 //#include "helpers.h"
-#include "../gui/gui_publisher_helper.h"
+//#include "../gui/gui_publisher_helper.h"
 #include "nav_msgs/Odometry.h"
 #include "../perception_tools/perception_2d.h"
 //#include "popt_pp.h"
@@ -61,11 +61,11 @@
 #include "Backprop.h"
 #include "JointOptimization.h"
 
-using cobot_gui::ClearDrawingMessage;
-using cobot_gui::DrawCircle;
-using cobot_gui::DrawLine;
-using cobot_gui::DrawPoint;
-using cobot_gui::DrawText;
+//using cobot_gui::ClearDrawingMessage;
+//using cobot_gui::DrawCircle;
+//using cobot_gui::DrawLine;
+//using cobot_gui::DrawPoint;
+//using cobot_gui::DrawText;
 using Eigen::Affine2d;
 using Eigen::Affine2f;
 using Eigen::Matrix2d;
@@ -99,7 +99,9 @@ using std::vector;
 //       deal with reading from input log for replay
 //       get covar from ceres (JO)
  
+//HitLSLAM::HitLSLAM() {}
 
+//HitLSLAM::~HitLSLAM() {}
 
 void HitLSLAM::init(const vector<Pose2Df> odom,
                     const vector<PointCloudf> rob_frame_pcs,
@@ -303,11 +305,11 @@ void HitLSLAM::replayFromLog(const vector<SingleInput> input_log) {
       backprop_.poses_ = poses_;
       backprop_.correction_ = correction;
       backprop_.backprop_bounds_ = backprop_bounds;
-      backprop_.d3_covariances_ = covariances_;
+      backprop_.covariances_ = covariances_;
       
       backprop_.Run();
       
-      covariances_ = backprop_.d3_covariances_;
+      covariances_ = backprop_.covariances_;
       poses_ = backprop_.poses_;
 
       //ceres_gradients_.clear();
@@ -320,11 +322,11 @@ void HitLSLAM::replayFromLog(const vector<SingleInput> input_log) {
         poses_[i].angle = atan2(sin(angle), cos(angle));
       }
         
-      joint_opt_.orig_odom_ = odometry_;
+      //joint_opt_.orig_odom_ = odometry_;
       joint_opt_.poses_ = poses_;
       joint_opt_.robot_frame_point_clouds_ = ROBOT_FRAME_point_clouds_;
       joint_opt_.robot_frame_normal_clouds_ = normal_clouds_;
-      joint_opt_.d3_covariances_ = covariances_;
+      joint_opt_.covariances_ = covariances_;
       joint_opt_.human_constraints_ = human_constraints_;
                   
       joint_opt_.Run();
@@ -405,12 +407,12 @@ void HitLSLAM::Run() {
       backprop_.poses_ = poses_;
       backprop_.correction_ = correction;
       backprop_.backprop_bounds_ = backprop_bounds;
-      backprop_.d3_covariances_ = covariances_;
+      backprop_.covariances_ = covariances_;
       
       backprop_.Run();
       
-      covariances_ = backprop_.d3_covariances_;
-      poses = backprop_.poses_;
+      covariances_ = backprop_.covariances_;
+      poses_ = backprop_.poses_;
 
       //ceres_gradients_.clear();
       //jacobian_init_ = false;
@@ -422,11 +424,11 @@ void HitLSLAM::Run() {
         poses_[i].angle = atan2(sin(angle), cos(angle));
       }
         
-      joint_opt_.orig_odom_ = odometry_;
+      //joint_opt_.orig_odom_ = odometry_;
       joint_opt_.poses_ = poses_;
       joint_opt_.robot_frame_point_clouds_ = ROBOT_FRAME_point_clouds_;
       joint_opt_.robot_frame_normal_clouds_ = normal_clouds_;
-      joint_opt_.d3_covariances_ = covariances_;
+      joint_opt_.covariances_ = covariances_;
       joint_opt_.human_constraints_ = human_constraints_;
                   
       joint_opt_.Run();

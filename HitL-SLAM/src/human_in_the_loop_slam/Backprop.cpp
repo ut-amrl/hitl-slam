@@ -38,7 +38,7 @@
 
 #include "ceres/ceres.h"
 #include "ceres/dynamic_autodiff_cost_function.h"
-#include "../../map/vector_map.h"
+//#include "../../map/vector_map.h"
 #include "./../perception_tools/perception_2d.h"
 #include "../../shared/math/eigen_helper.h"
 #include "../../shared/math/util.h"
@@ -47,7 +47,7 @@
 #include "../../shared/util/timer.h"
 //#include "vector_localization/residual_functors.h"
 //#include <vectorparticlefilter.h>
-#include "../../vmapping/vector_mapping.h"
+//#include "../../vmapping/vector_mapping.h"
 
 // #define ENABLE_TIMING
 
@@ -64,7 +64,7 @@ using Eigen::Matrix2d;
 using Eigen::Matrix3f;
 using Eigen::Matrix3d;
 using Eigen::Rotation2Df;
-using Eigen::ScalarCross;
+//using Eigen::ScalarCross;
 using Eigen::Vector2f;
 using Eigen::Vector2d;
 using Eigen::Vector3f;
@@ -81,15 +81,15 @@ using std::pair;
 using std::size_t;
 using std::string;
 using std::vector;
-using vector_localization::CorrectionType;
-using vector_localization::CorrectionTypeNames;
-using vector_localization::LTSConstraint;
-using vector_localization::PointToLineConstraint;
+//using vector_localization::CorrectionType;
+//using vector_localization::CorrectionTypeNames;
+//using vector_localization::LTSConstraint;
+//using vector_localization::PointToLineConstraint;
 //using vector_localization::PoseConstraint;
 
 typedef Eigen::Translation<float, 2> Translation2Df;
 
-namespace vector_localization {
+//namespace vector_localization {
 
 Backprop::Backprop() {}
 
@@ -103,20 +103,20 @@ void Backprop::BackPropagateError() {
   Vector2f destination = poses_[max_poses].translation +
                         Vector2f(correction_(0), correction_(1));
 
-  double destination_rot_variance = 0.0001; //radians
-  double destination_trans_variance = 0.001; //meters
-  vector<double> rot_sigmas;
-  vector<double> trans_sigmas;
-  for (size_t i = 0; i < d3_covariances_.size(); ++i) {
-    rot_sigmas.push_back(d3_covariances_[i](2,2));
-    trans_sigmas.push_back((d3_covariances_[i](0,0) +
-                            d3_covariances_[i](1,1))/2.0);
+  float destination_rot_variance = 0.0001; //radians
+  float destination_trans_variance = 0.001; //meters
+  vector<float> rot_sigmas;
+  vector<float> trans_sigmas;
+  for (size_t i = 0; i < covariances_.size(); ++i) {
+    rot_sigmas.push_back(covariances_[i](2,2));
+    trans_sigmas.push_back((covariances_[i](0,0) +
+                            covariances_[i](1,1))/2.0);
   }
 
-  vector<double> rot_weights;
-  vector<double> trans_weights;
-  double sum_of_rot_var = 0.0;
-  double sum_of_trans_var = 0.0;
+  vector<float> rot_weights;
+  vector<float> trans_weights;
+  float sum_of_rot_var = 0.0;
+  float sum_of_trans_var = 0.0;
   //tabulate variances
   for (int i = min_poses; i <= max_poses; ++i) {
     sum_of_rot_var += rot_sigmas[i];
@@ -136,9 +136,9 @@ void Backprop::BackPropagateError() {
   CHECK_EQ(rot_weights.size(), trans_weights.size());
 
   // calculate beta for variance updates
-  double rot_beta = 1/(1 + (rot_sigmas[max_poses - 1] /
+  float rot_beta = 1/(1 + (rot_sigmas[max_poses - 1] /
                                destination_rot_variance));
-  double trans_beta = 1/(1 + (trans_sigmas[max_poses - 1] /
+  float trans_beta = 1/(1 + (trans_sigmas[max_poses - 1] /
                                  destination_trans_variance));
 
   //update fused rotation uncertainty
@@ -157,17 +157,17 @@ void Backprop::BackPropagateError() {
 
   // update covariance estimates
   for (int i = min_poses; i < max_poses; ++i) {
-    d3_covariances_[i](0,0) *= trans_beta;
-    d3_covariances_[i](0,1) *= trans_beta;
-    d3_covariances_[i](1,0) *= trans_beta;
-    d3_covariances_[i](1,1) *= trans_beta;
+    covariances_[i](0,0) *= trans_beta;
+    covariances_[i](0,1) *= trans_beta;
+    covariances_[i](1,0) *= trans_beta;
+    covariances_[i](1,1) *= trans_beta;
 
-    d3_covariances_[i](0,2) *= rot_beta;
-    d3_covariances_[i](0,2) *= rot_beta;
-    d3_covariances_[i](2,0) *= rot_beta;
-    d3_covariances_[i](2,1) *= rot_beta;
+    covariances_[i](0,2) *= rot_beta;
+    covariances_[i](0,2) *= rot_beta;
+    covariances_[i](2,0) *= rot_beta;
+    covariances_[i](2,1) *= rot_beta;
 
-    d3_covariances_[i](2,2) *= rot_beta;
+    covariances_[i](2,2) *= rot_beta;
   }
 
   //APPLY ROTATION
@@ -210,4 +210,4 @@ void Backprop::Run() {
 }
 
 
-}  // namespace vector_localization
+//}  // namespace vector_localization
