@@ -20,8 +20,8 @@
 #ifndef BACKPROP_H
 #define BACKPROP_H
 
-#include <pthread.h>
-#include <semaphore.h>
+//#include <pthread.h>
+//#include <semaphore.h>
 
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
@@ -36,7 +36,9 @@
 //#include "vector_map.h"
 //#include "vector_mapping.h"
 
-namespace vector_localization {
+
+
+//namespace vector_localization {
 
 class Backprop {
  public:
@@ -71,6 +73,6 @@ class Backprop {
 
 };
 
-}  // namespace vector_localization
+//}  // namespace vector_localization
 
 #endif  // backprop_H

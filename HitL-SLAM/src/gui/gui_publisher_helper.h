@@ -140,7 +140,7 @@ void ClearDrawingMessage(vector_slam_msgs::LidarDisplayMsg* display_msg) {
 
 
 
-
+/*
 void DrawGradients(const size_t start_pose, const size_t end_pose,
                    const vector<double>& gradients, uint32_t color) {
 
@@ -245,7 +245,9 @@ void DrawObservations(
     }
   }
 }
+*/
 
+/*
 void DrawPoseCovariance(const Vector2f& pose, const Matrix2f& covariance) {
   static const float kDTheta = RAD(15.0);
   Eigen::SelfAdjointEigenSolver<Matrix2f> solver;
@@ -262,7 +264,9 @@ void DrawPoseCovariance(const Vector2f& pose, const Matrix2f& covariance) {
     DrawLine(v1_global, v2_global, kPoseCovarianceColor, &display_message_);
   }
 }
+*/
 
+/*
 void DrawPoses(const size_t start_pose, const size_t end_pose,
     const vector<Pose2Df>& odometry_poses, const vector<double>& poses,
     const vector<Matrix2f>& covariances) {
@@ -270,11 +274,13 @@ void DrawPoses(const size_t start_pose, const size_t end_pose,
   Vector2f pose_location_last(0.0, 0.0);
   float pose_angle_last = 0.0;
   const bool valid_covariances = (covariances.size() > end_pose);
-  //double L = 0.5;
+*/ 
+
+ //double L = 0.5;
   //double l = 0.1;
 
-  for (size_t i = start_pose; i <= end_pose; ++i) {
-    const Vector2f pose_location(poses[3 * i + 0], poses[3 * i + 1]);
+ // for (size_t i = start_pose; i <= end_pose; ++i) {
+ //   const Vector2f pose_location(poses[3 * i + 0], poses[3 * i + 1]);
 /*
     //draw arrows for poses here
     Vector2f arr(L*cos(poses[3*i+2]), L*sin(poses[3*i+2]));
@@ -290,7 +296,7 @@ void DrawPoses(const size_t start_pose, const size_t end_pose,
     DrawLine(W1, arr, kOdometryColor, &display_message_);
     DrawLine(W2, arr, kOdometryColor, &display_message_);
     */
-
+/*
    if (i > start_pose) {
       DrawLine(pose_location, pose_location_last, kTrajectoryColor,
                &display_message_);
@@ -308,7 +314,7 @@ void DrawPoses(const size_t start_pose, const size_t end_pose,
     pose_angle_last = poses[3 * i + 2];
   }
 }
-
+*/
 
 
 

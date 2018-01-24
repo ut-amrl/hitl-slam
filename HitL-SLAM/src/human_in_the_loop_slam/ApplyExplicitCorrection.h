@@ -20,8 +20,8 @@
 #ifndef APPLYEXPLICITCORRECTION_H
 #define APPLYEXPLICITCORRECTION_H
 
-#include <pthread.h>
-#include <semaphore.h>
+//#include <pthread.h>
+//#include <semaphore.h>
 
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
@@ -34,9 +34,11 @@
 #include "../perception_tools/perception_2d.h"
 //#include "pthread_utils.h"
 //#include "vector_map.h"
-#include "../vmapping/vector_mapping.h"
+//#include "../vmapping/vector_mapping.h"
 
-namespace vector_localization {
+#include "human_constraints.h"
+
+//namespace vector_localization {
 
 class AppExpCorrect {
  public:
@@ -51,7 +53,7 @@ class AppExpCorrect {
 
   void Run();
 
-  vector_localization::CorrectionType correction_type_;
+  CorrectionType correction_type_;
 
   std::vector<Eigen::Vector2f> selected_points_;
 
@@ -65,7 +67,7 @@ class AppExpCorrect {
   
   Eigen::Vector3f correction_;
   
-  std::vector<VectorMapping::HumanConstraint> new_human_constraints_;
+  std::vector<HumanConstraint> new_human_constraints_;
   
  private:
   void SaveMapState();
@@ -102,7 +104,7 @@ class AppExpCorrect {
   void AddHumanCorrections(std::vector<perception_2d::Pose2Df>* poses,
                            const std::vector<Eigen::Vector2f> selected_points,
                            const int mode,
-                           std::vector<VectorMapping::HumanConstraint>&
+                           std::vector<HumanConstraint>&
                            human_constraints);
 
   void CalculateExplicitCorrections(std::vector<CorrectionPair>* corrections);
@@ -121,6 +123,6 @@ class AppExpCorrect {
 
 };
 
-}  // namespace vector_localization
+//}  // namespace vector_localization
 
 #endif  // app exp corr _H

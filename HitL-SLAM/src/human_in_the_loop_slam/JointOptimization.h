@@ -33,14 +33,16 @@
 #include "../perception_tools/kdtree.h"
 #include "../perception_tools/perception_2d.h"
 #include "pthread_utils.h"
-#include "../map/vector_map.h"
-#include "../vmapping/vector_mapping.h"
+//#include "../map/vector_map.h"
+//#include "../vmapping/vector_mapping.h"
 
-#include "../../extern_libraries/CImg/CImg.h"
+#include <CImg.h>
 
-namespace vector_localization {
+//#include "../../extern_libraries/CImg/CImg.h"
 
+//namespace vector_localization {
 
+#include "human_constraints.h"
 
 class JointOpt {
  public:
@@ -253,6 +255,6 @@ class JointOpt {
 
 };
 
-}  // namespace vector_localization
+//}  // namespace vector_localization
 
 #endif  // jointopt_H

@@ -20,13 +20,17 @@
 #ifndef EMINPUT_H
 #define EMINPUT_H
 
-#include <pthread.h>
-#include <semaphore.h>
+//i#include <pthread.h>
+//#include <semaphore.h>
+
+#include "human_constraints.h"
 
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 #include <string>
 #include <vector>
+
+
 
 //#include "ceres/ceres.h"
 //#include "geometry.h"
@@ -34,9 +38,11 @@
 //#include "perception_tools/perception_2d.h"
 //#include "pthread_utils.h"
 //#include "vector_map.h"
-#include "../vmapping/vector_mapping.h"
+//#include "../vmapping/vector_mapping.h"
 
-namespace vector_localization {
+//namespace vector_localization {
+
+
 
 class EMInput {
  public:
@@ -61,7 +67,7 @@ class EMInput {
   // bounds between which to use COP-SLAM TODO: inclusive?
   std::pair<int, int> backprop_bounds_;
   
-  vector_localization::CorrectionType correction_type_;
+  CorrectionType correction_type_;
   
  private:
 
@@ -90,6 +96,6 @@ class EMInput {
   
 };
 
-}  // namespace vector_localization
+//}  // namespace vector_localization
 
 #endif  // EMINPUT_H

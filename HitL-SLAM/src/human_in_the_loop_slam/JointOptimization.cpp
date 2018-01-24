@@ -136,7 +136,7 @@ float kMaxPointCloudRange = 6.0;
 
 
 void SetSolverOptions(
-    const vector_localization::VectorMapping::VectorMappingOptions&
+    const vector_localization::VectorMappingOptions&
         localization_options,
     ceres::Solver::Options* options_ptr) {
   ceres::Solver::Options& solver_options = *options_ptr;
@@ -204,7 +204,7 @@ namespace vector_localization {
 JointOpt::JointOpt() {}
 JointOpt::~JointOpt() {}
 
-bool JointOpt::LoadConfiguration(VectorMapping::VectorMappingOptions* options) {
+bool JointOpt::LoadConfiguration(VectorMappingOptions* options) {
   if (!config_.readFiles()) return false;
 
   ConfigReader::SubTree c(config_,"VectorMapping");
@@ -426,11 +426,11 @@ void JointOpt::FindVisualOdometryCorrespondences(int min_poses, int max_poses) {
   const size_t poses_end = min(
       static_cast<size_t>(max_poses + 1), point_clouds_g_.size());
   if (int(poses_end) < min_poses + 1) return;
-  vector<vector<VectorMapping::PointToPointCorrespondence>>
+  vector<vector<PointToPointCorrespondence>>
                    pose_correspondences(poses_end - min_poses - 1);
   //OMP_PARALLEL_FOR
   for (size_t i = min_poses; i < poses_end - 1; ++i) {
-    VectorMapping::PointToPointCorrespondence correspondence;
+    PointToPointCorrespondence correspondence;
     correspondence.source_pose = i;
     correspondence.target_pose = i + 1;
     Affine2f source_to_target_tf = RelativePoseTransform(i, i + 1);
@@ -532,7 +532,7 @@ void JointOpt::AddSTFConstraints(ceres::Problem* problem) {
   TIME_FUNCTION
   cout << "stfs size: " << point_point_glob_correspondences_.size() << endl;
   for (size_t i = 0; i < point_point_glob_correspondences_.size(); ++i) {
-    VectorMapping::PointToPointGlobCorrespondence& correspondence =
+    PointToPointGlobCorrespondence& correspondence =
         point_point_glob_correspondences_[i];
 
     DCHECK_NE(correspondence.pose_index0, correspondence.pose_index1);
@@ -559,7 +559,7 @@ void JointOpt::FindSTFCorrespondences(
   const size_t poses_end = min(
       static_cast<size_t>(max_poses + 1), point_clouds_g_.size());
   CHECK_GT(pose_array_.size(), poses_end - 1);
-  vector<vector<VectorMapping::PointToPointGlobCorrespondence>>
+  vector<vector<PointToPointGlobCorrespondence>>
 pose_point_correspondences(
       poses_end - min_poses);
   point_point_glob_correspondences_.clear();
@@ -571,7 +571,7 @@ pose_point_correspondences(
     //     pose_array_[3 * i], pose_array_[3 * i + 1]);
     for (size_t j = min_poses ; j < poses_end; j += kPointMatchSeparation) {
       if (i == j) continue;
-      VectorMapping::PointToPointGlobCorrespondence correspondence;
+      PointToPointGlobCorrespondence correspondence;
       vector<size_t> source_point_indices;
       correspondence.pose_index0 = i;
       correspondence.pose_index1 = j;
@@ -959,7 +959,7 @@ void JointOpt::AddHumanConstraints(ceres::Problem* problem) {
   //int prev_id = -1;
   for (size_t i = 0; i < human_constraints_.size(); ++i) {
     for (size_t j = 0; j < human_constraints_[i].size(); ++j) {
-      VectorMapping::HumanConstraint constraint = human_constraints_[i][j];
+      HumanConstraint constraint = human_constraints_[i][j];
       info_mat_[0](constraint.anchor_pose_id, constraint.constrained_pose_id) = 255.0;
       info_mat_[0](constraint.constrained_pose_id, constraint.anchor_pose_id) = 255.0;
       if (constraint.constraint_type == vector_localization::CorrectionType::kLineSegmentCorrection) {

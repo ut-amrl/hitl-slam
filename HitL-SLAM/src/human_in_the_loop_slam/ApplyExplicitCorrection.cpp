@@ -467,7 +467,7 @@ void AppExpCorrect::calculateConstraintTargets() {
       float perp_dist = n.dot(pose_rel);
       float angle_dist = atan2(sin(pose_angle - anchor_angle), cos(pose_angle - anchor_angle));
       
-      VectorMapping::HumanConstraint single_constraint;
+      HumanConstraint single_constraint;
       single_constraint.constraint_type = correction_type_;
       single_constraint.anchor_pose_id = anchor_poses_[i];
       single_constraint.constrained_pose_id = corrected_poses_[j];
