@@ -5,12 +5,12 @@ ROSBUILD_ADD_EXECUTABLE(${target}
 ADD_DEPENDENCIES(${target}
     shared_libraries
     gui_libraries
-    rosbuild_precompile
-    map_libraries)
+    rosbuild_precompile)
+    #map_libraries)
 TARGET_LINK_LIBRARIES(${target}
     shared_libraries
     gui_libraries
     ${QT_LIBRARIES}
-    ${libs}
-    map_libraries)
+    ${libs})
+    #map_libraries)
 

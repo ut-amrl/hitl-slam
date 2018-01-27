@@ -171,8 +171,14 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src/perception_tools)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/vector_localization)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/vector_mapping)
 
+
+
+
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/episodic_non_merkov_localization)
+
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/long_term_vector_mapping)
+
+
 
 
 #add_subdirectory(${PROJECT_SOURCE_DIR}/src/vector_slam)
