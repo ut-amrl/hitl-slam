@@ -145,7 +145,16 @@ $ ./bin/localization_gui
 
 <!--- TODO: describe features / options of the gui --->
 
-The `HitL_SLAM` executable can be run in a similar fashion, but also requires two command line arguments. The first is an options flag, which must take one of two values: `-P` or `-L`. The second is the path a file e.g. `exampledata/2016-02-16-16-01-46.bag.stfs.covars`. `-P` signals a start from scratch, while `-L` tells HitL-SLAM that it will be loading a previous session, stored in a log file.
+The `HitL_SLAM` executable can be run in a similar fashion, but also requires two command line arguments. The first is an options flag, which must take one of two values: `-P` or `-L`. The second is the path a file e.g. `exampledata/2016-02-16-16-01-46.bag.stfs.covars`. An example command to run Human-in-the-Loop SLAM is
+
+```
+$ cd ~/PATH_TO/hitl-slam/HitL-SLAM
+$ ./bin/HitL_SLAM -P exampledata/2016-02-16-16-01-46.bag.stfs.covars
+```
+
+`-P` signals a start from scratch, while `-L` tells HitL-SLAM that it will be loading a previous session, stored in a log file. 
+
+For a full example of all main HitL-SLAM features, see the **Example Usage** section.
 
 ### 3. Logging and Replaying
 
