@@ -65,7 +65,7 @@ Replace `PATH` with the actual path where you have cloned the repository.
 To compile the source code, run the following commands.
 
 ```bash
-$ cd ~/PATH_TO/hitl-slam/vector_slam_msgs
+$ cd ~/PATH_TO/hitl-slam/vector_slam_msgs/
 $ mkdir build
 $ cd build
 $ cmake ..
@@ -136,8 +136,16 @@ By default, Human-in-the-Loop SLAM and the accompanying GUI are set up to run as
 
 ### 2. Command Line Arguments and Options
 
-After compilation, the `HitL_SLAM` and `localization_gui` executables are stored in the `bin/` directory. 
+After compilation, the `HitL_SLAM` and `localization_gui` executables will show up in the `bin/` directory. To start the GUI, in a new terminal run the `localization_gui` executable.
 
+```
+$ cd ~/PATH_TO/hitl-slam/HitL-SLAM
+$ ./bin/localization_gui
+```
+
+<!--- TODO: describe features / options of the gui --->
+
+The `HitL_SLAM` executable can be run in a similar fashion, but also requires two command line arguments. The first is an options flag, which must take one of two values: `-P` or `-L`. The second is the path a file e.g. `exampledata/2016-02-16-16-01-46.bag.stfs.covars`. `-P` signals a start from scratch, while `-L` tells HitL-SLAM that it will be loading a previous session, stored in a log file.
 
 ### 3. Logging and Replaying
 
@@ -149,7 +157,7 @@ TODO: finish
 
 ### 5. Example Usage
 
-TODO: finish and add pictures
+TODO: start up, make a correction, log it, quit, load a log, replay, make a second correction, undo it, do it again, save
 
 
 |Confidence match visualizations | Path visualization        |
@@ -164,4 +172,3 @@ TODO: finish and add pictures
 ## License
 
 This software is released under the [GNU LGPL License](LICENSE).
-
