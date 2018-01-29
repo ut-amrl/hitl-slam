@@ -1,7 +1,7 @@
 void SignedDistanceFunction::setParameters() {
-  image_resolution_ = 
-  min_sdf_weight_ = 
-  image_border_ = 
+  //image_resolution_ = 
+  //min_sdf_weight_ = 
+  //image_border_ = 
 }
 
 cimg_library::CImg<float> SignedDistanceFunctio::getWeights() {
@@ -19,7 +19,7 @@ Eigen::Vector2f SignedDistanceFunctio::getOrigin() {
 //TODO incorporate age into init and update
 
 void SignedDistanceFunction::init(const vector<Pose2Df> poses, 
-                                  vector<PointCloudf> point_clouds) {
+                                  const vector<PointCloudf> point_clouds) {
 
   const float pixel_half_width = sqrt(2.0) * image_resolution_;
 
@@ -197,7 +197,7 @@ void SignedDistanceFunction::save(const string weights_image_file,
   display_.save_png(sdf_image_file.c_str());
 }
 
-void update(SignedDistanceFunction subsumed) {
+void SignedDistanceFunction::update(SignedDistanceFunction subsumed) {
   
   float O0x = origin_(0);
   float O0y = origin_(1);

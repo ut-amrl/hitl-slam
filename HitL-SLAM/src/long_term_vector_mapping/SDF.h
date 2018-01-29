@@ -63,6 +63,6 @@ class SignedDistanceFunction {
     float T_dynamic_ = 0.2;
    
     // Angular resolution of laser. 
-    // A laser with a 180 degree FOV which 
-    float laser_angular_resolution_ = 
+    // A laser with a 180 degree FOV which casts 360 rays has a resolution of 0.5
+    float laser_angular_resolution_ = M_PI * ((270.0 / 1024.0) / 180.0);
 };
