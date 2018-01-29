@@ -26,14 +26,16 @@ Link to paper: [https://arxiv.org/pdf/1711.08566.pdf](https://arxiv.org/pdf/1711
 - A C++ compiler (*e.g.*, [GCC](http://gcc.gnu.org/))
 - [cmake](http://www.cmake.org/cmake/resources/software.html)
 - [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu)
-- TODO: finish this list - ceres, cimg,  
+- [Ceres Solver](http://www.ceres-solver.org/)
+- [CImg](http://www.cimg.eu/)
+- TODO: finish this list  
 
 **Note:** Other versions of ROS may work, but this code has only been tested thoroughly on Indigo.
 
 Use the following command to install dependencies:
 
 ```bash
-$ sudo apt-get install TODO
+$ sudo apt-get install cimg-dev TODO: finish
 ```
 
 
@@ -41,54 +43,70 @@ $ sudo apt-get install TODO
 
 ### 1. Building HiTL-SLAM
 
-Clone the repository:
+`cd` to the directory where you want to install Human-in-the-Loop SLAM, and clone the repository.
 
 ```bash
 $ git clone https://github.com/umass-amrl/hitl-slam
 ```
 
-need to do the following: 
-The script `build.sh` compiles the JPP library:
+For compiling the ROS wrapper, `rosbuild` is used. `rosbuild` requires the path of the ROS wrapper to be added to 
+the `ROS_PACKAGE_PATH` environment variable. To do this, add the following line in your `.bashrc` file. 
+
 
 ```bash
-$ cd jpp
-$ chmod +x build.sh
-$ ./build.sh
+$ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/PATH/hitl-slam
 ```
 
-### 2. combine this section with the above
-
-For compiling the ROS wrapper, `rosbuild` is used. Add the path of the ROS wrapper to `ROS_PACKAGE_PATH` and put the following line in your `.bashrc` file. 
-Replace `PATH` by the actual path where you have cloned the repository:
+Replace `PATH` with the actual path where you have cloned the repository. To compile the source code, run the script `TODO.sh` with the following commands.
 
 ```bash
-$ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/PATH/jpp/ROS
+$ cd TODO
 ```
 
-Execute the `build_ros.sh` script:
+## Using Human-in-the-Loop SLAM on Example Data
 
-```bash
-$ chmod +x build_ros.sh
-$ ./build_ros.sh
-```
-## Running Human-in-the-Loop SLAM on Example Data
-
-## Running Human-in-the-Loop SLAM on Standard Data
+TODO: find out where / how to host AMRL / LGRC data
 
 ### 1. Download Datasets
 
-The complete example data (AMRL and KITTI) along with calibration files can be found 
-[here](https://greyhound.cs.umass.edu/owncloud/index.php/s/3g9AwCSkGi6LznK).
+Example data collected at University of MAssachusetts Amherst, and used in the corresponding paper can be found 
+[here](TODO). Once downloaded, move the files into the `hitl-slam/exampledata/` directory.
 
-### 2. Running JPP
+To
 
-After compilation, the `jpp` binary file is store inside the `bin/` folder. For processing a single pair of stereo images, use:
+## Using Human-in-the-Loop SLAM on Standard Data
 
-```bash
-$ ./bin/jpp -l [path/to/left/image] -r [path/to/right/image] -c [path/to/stereo/calibration/file] -j [path/to/jpp/config/file] -o [output_mode]
-```
+### 1. Download Datasets
 
-For processing multiple stereo pairs stored in a directory, use:
+TODO: add links to some standard data
+
+### 2. Converting Data to Homogenous Format
+
+TODO: add instructions for using data conversion tools
+
+## Using Human-in-the-Loop SLAM on Your Own Data
+
+### 1. Convert Data to Homogenous Format
+
+TODO: add instructions for using data conversion tools
+
+## Running Human-in-the-Loop SLAM
+
+### Starting ROS
+
+By default, Human-in-the-Loop SLAM and the accompanying GUI are set up to run as ROS nodes. So, before proceeding, make sure there is a
+`roscore` process running.
+
+### Command Line Arguments and Options
+
+
+After compilation, the `HitL_SLAM` and `localization_gui` executables are stored in the `bin/` directory. 
+
+
+
+
+
+
 
 ```bash
 $ ./bin/jpp -n [number of pairs] -d [path/to/directory] -c [path/to/stereo/calibration/file] -j [path/to/jpp/config/file] -o [output_mode]
@@ -132,54 +150,11 @@ $ ./bin/jpp -n 158 -d AMRL/ -c calibration/amrl_jackal_webcam_stereo.yml -j cfg/
 |:------------------------------:|:-------------------------:|
 |![](dumps/rrt73-vis.jpg)        | ![](dumps/rrt73-path.jpg) |
 
-### 3. Running JPP ROS
 
-Run the ROS node `navigation`:
 
-```bash
-$ rosrun jpp navigation -l [left/image/topic] -r [right/image/topic] -c [path/to/stereo/calibration/file] -j [path/to/jpp/config/file] -o [output_mode]
-```
+### Saving Output Data
 
-The same flags for displaying/writing visualizations can be used for the ROS node as well.
-
-```bash
-Usage: navigation [OPTION...]
-  -l, --left_topic=STR              Left image topic name
-  -r, --right_topic=STR             Right image topic name
-  -c, --calib_file=STR              Stereo calibration file name
-  -j, --jpp_config_file=STR         JPP config file name
-  -o, --output=STR                  Output - astar, rrt, debug
-  -v, --visualize=NUM               Set v=1 for displaying visualizations
-  -w, --write_files=NUM             Set w=1 for writing visualizations to files
-  -d, --dynamic_reconfigure=NUM     Set d=1 for enabling dynamic reconfigure
-```
-
-JPP configuration parameters can be changed realtime by using `rqt_reconfigure`:
-
-```bash
-$ rosrun rqt_reconfigure rqt_reconfigure
-```
-
-Make sure you set the flag `-d 1` while using dynamic reconfigure.
-
-## Running JPP on your Datasets
-
-### 1. Stereo Calibration
-
-To run JPP on your own data, you need to have a pair of calibrated stereo cameras. For stereo calibration it is recommended to use 
-[this tool](https://github.com/sourishg/stereo-calibration). The `XR` and `XT` matrices in the calibration file are the transformation matrices from the left 
-camera reference frame to the robot reference frame. These matrices depends on how the stereo camera is mounted on the robot. Initially after stereo 
-calibration (using the tool mentioned) you will not have the `XR` and `XT` matrices in your calibration file. You need to manually calibrate them and add them 
-to the calibration file. Also, you only need the following matrices in your calibration file: `K1`, `K2`, `D1`, `D2`, `R`, `T`, `XR`, and `XT`. An example 
-calibration file can be found inside the `calibration/` folder.
-
-If you cannot calibrate for `XR` and `XT` then just set them to the identity and zero matrices respectively. Then use this [stereo dense 
-reconstruction](https://github.com/umass-amrl/stereo_dense_reconstruction) tool to visualize how the point cloud looks in the robot reference frame and 
-visually align the ground plane with `z=0`.
-
-### 2. Running JPP
-
-JPP can be run in the same way as explained for the exmaple AMRL and KITTI datasets.
+TODO: 
 
 ## License
 
