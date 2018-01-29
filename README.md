@@ -38,9 +38,8 @@ Link to paper: [https://arxiv.org/pdf/1711.08566.pdf](https://arxiv.org/pdf/1711
 Use the following command to install dependencies:
 
 ```bash
-$ sudo apt-get install g++ cmake libpopt-dev cimg-dev TODO: finish
+$ sudo apt-get install g++ cmake libpopt-dev cimg-dev
 ```
-
 
 ## Compiling
 
@@ -64,6 +63,9 @@ Replace `PATH` with the actual path where you have cloned the repository. To com
 
 ```bash
 $ cd ~/PATH_TO/hitl-slam/vector_slam_msgs
+$ mkdir build
+$ cd build
+$ cmake ..
 $ make
 $ cd ~/PATH_TO/hitl-slam/HitL-SLAM/
 $ mkdir build
@@ -73,6 +75,18 @@ $ cd ../
 $ make
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
 ## Using Human-in-the-Loop SLAM on Example Data
 
 TODO: find out where / how to host AMRL / LGRC data
@@ -80,9 +94,10 @@ TODO: find out where / how to host AMRL / LGRC data
 ### 1. Download Datasets
 
 Example data collected at University of MAssachusetts Amherst, and used in the corresponding paper can be found 
-[here](TODO). Once downloaded, move the files into the `hitl-slam/exampledata/` directory.
+[here](TODO). Once downloaded, move the files into a directory of your choice, for example: 
+`hitl-slam/HitL-SLAM/exampledata/`.
 
-To
+To execute HitL-SLAM, please see the section titled **Running Human-in-the-Loop SLAM**.
 
 ## Using Human-in-the-Loop SLAM on Standard Data
 
@@ -102,69 +117,38 @@ TODO: add instructions for using data conversion tools
 
 ## Running Human-in-the-Loop SLAM
 
-### Starting ROS
+### 1. Starting ROS
 
 By default, Human-in-the-Loop SLAM and the accompanying GUI are set up to run as ROS nodes. So, before proceeding, make sure there is a
-`roscore` process running.
+`roscore` process running. Next, open two new terminals; one will be used to launch the GUI, and the other will used to run the HitL-SLAM node.
 
-### Command Line Arguments and Options
+### 2. Command Line Arguments and Options
 
-
+TODO: finish
 After compilation, the `HitL_SLAM` and `localization_gui` executables are stored in the `bin/` directory. 
 
 
+### 3. Logging and Replaying
 
+TODO: fill out
 
+### 4. Saving Output Data
 
+TODO: finish
 
+### 5. Example Usage
 
-```bash
-$ ./bin/jpp -n [number of pairs] -d [path/to/directory] -c [path/to/stereo/calibration/file] -j [path/to/jpp/config/file] -o [output_mode]
-```
+TODO: finish and add pictures
 
-**Note:** stereo image pairs inside the directory must be named like this: `left1.jpg`, `left2.jpg`, ... , `right1.jpg`, `right2.jpg`, ...
-
-For the example datasets, calibration files are stored in the `calibration/` folder and JPP configurations are stored in the `cfg/` folder. JPP operates on 
-3 output modes (set by the `-o` flag) as of now: `astar`, `rrt`, and `debug` mode. Set the flag `-v 1` for generating visualizations.
-
-```bash
-Usage: jpp [OPTION...]
-  -n, --num_imgs=NUM            Number of images to be processed
-  -d, --img_dir=STR             Directory containing image pairs (set if n > 0)
-  -l, --left_img=STR            Left image file name
-  -r, --right_img=STR           Right image file name
-  -c, --calib_file=STR          Stereo calibration file name
-  -j, --jpp_config_file=STR     JPP config file name
-  -o, --output=STR              Output - astar, rrt, debug
-  -v, --visualize=NUM           Set v=1 for displaying visualizations
-  -w, --write_files=NUM         Set w=1 for writing visualizations to files
-```
-
-For example, running JPP on the KITTI dataset in `astar` mode:
-
-```bash
-$ ./bin/jpp -n 33 -d KITTI/ -c calibration/kitti_2011_09_26.yml -j cfg/kitti.cfg -o astar -v 1
-```
 
 |Confidence match visualizations | Path visualization        |
 |:------------------------------:|:-------------------------:|
 |![](dumps/astar7-vis.jpg)       | ![](dumps/astar7-path.jpg)|
 
-Running JPP on the AMRL dataset in `rrt` mode:
-
-```bash
-$ ./bin/jpp -n 158 -d AMRL/ -c calibration/amrl_jackal_webcam_stereo.yml -j cfg/amrl.cfg -o rrt -v 1
-```
 
 |Confidence match visualizations | Path visualization        |
 |:------------------------------:|:-------------------------:|
 |![](dumps/rrt73-vis.jpg)        | ![](dumps/rrt73-path.jpg) |
-
-
-
-### Saving Output Data
-
-TODO: 
 
 ## License
 
