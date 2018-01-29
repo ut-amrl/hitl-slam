@@ -98,3 +98,90 @@ $ ./bin/jpp -n [number of pairs] -d [path/to/directory] -c [path/to/stereo/calib
 
 For the example datasets, calibration files are stored in the `calibration/` folder and JPP configurations are stored in the `cfg/` folder. JPP operates on 
 3 output modes (set by the `-o` flag) as of now: `astar`, `rrt`, and `debug` mode. Set the flag `-v 1` for generating visualizations.
+
+```bash
+Usage: jpp [OPTION...]
+  -n, --num_imgs=NUM            Number of images to be processed
+  -d, --img_dir=STR             Directory containing image pairs (set if n > 0)
+  -l, --left_img=STR            Left image file name
+  -r, --right_img=STR           Right image file name
+  -c, --calib_file=STR          Stereo calibration file name
+  -j, --jpp_config_file=STR     JPP config file name
+  -o, --output=STR              Output - astar, rrt, debug
+  -v, --visualize=NUM           Set v=1 for displaying visualizations
+  -w, --write_files=NUM         Set w=1 for writing visualizations to files
+```
+
+For example, running JPP on the KITTI dataset in `astar` mode:
+
+```bash
+$ ./bin/jpp -n 33 -d KITTI/ -c calibration/kitti_2011_09_26.yml -j cfg/kitti.cfg -o astar -v 1
+```
+
+|Confidence match visualizations | Path visualization        |
+|:------------------------------:|:-------------------------:|
+|![](dumps/astar7-vis.jpg)       | ![](dumps/astar7-path.jpg)|
+
+Running JPP on the AMRL dataset in `rrt` mode:
+
+```bash
+$ ./bin/jpp -n 158 -d AMRL/ -c calibration/amrl_jackal_webcam_stereo.yml -j cfg/amrl.cfg -o rrt -v 1
+```
+
+|Confidence match visualizations | Path visualization        |
+|:------------------------------:|:-------------------------:|
+|![](dumps/rrt73-vis.jpg)        | ![](dumps/rrt73-path.jpg) |
+
+### 3. Running JPP ROS
+
+Run the ROS node `navigation`:
+
+```bash
+$ rosrun jpp navigation -l [left/image/topic] -r [right/image/topic] -c [path/to/stereo/calibration/file] -j [path/to/jpp/config/file] -o [output_mode]
+```
+
+The same flags for displaying/writing visualizations can be used for the ROS node as well.
+
+```bash
+Usage: navigation [OPTION...]
+  -l, --left_topic=STR              Left image topic name
+  -r, --right_topic=STR             Right image topic name
+  -c, --calib_file=STR              Stereo calibration file name
+  -j, --jpp_config_file=STR         JPP config file name
+  -o, --output=STR                  Output - astar, rrt, debug
+  -v, --visualize=NUM               Set v=1 for displaying visualizations
+  -w, --write_files=NUM             Set w=1 for writing visualizations to files
+  -d, --dynamic_reconfigure=NUM     Set d=1 for enabling dynamic reconfigure
+```
+
+JPP configuration parameters can be changed realtime by using `rqt_reconfigure`:
+
+```bash
+$ rosrun rqt_reconfigure rqt_reconfigure
+```
+
+Make sure you set the flag `-d 1` while using dynamic reconfigure.
+
+## Running JPP on your Datasets
+
+### 1. Stereo Calibration
+
+To run JPP on your own data, you need to have a pair of calibrated stereo cameras. For stereo calibration it is recommended to use 
+[this tool](https://github.com/sourishg/stereo-calibration). The `XR` and `XT` matrices in the calibration file are the transformation matrices from the left 
+camera reference frame to the robot reference frame. These matrices depends on how the stereo camera is mounted on the robot. Initially after stereo 
+calibration (using the tool mentioned) you will not have the `XR` and `XT` matrices in your calibration file. You need to manually calibrate them and add them 
+to the calibration file. Also, you only need the following matrices in your calibration file: `K1`, `K2`, `D1`, `D2`, `R`, `T`, `XR`, and `XT`. An example 
+calibration file can be found inside the `calibration/` folder.
+
+If you cannot calibrate for `XR` and `XT` then just set them to the identity and zero matrices respectively. Then use this [stereo dense 
+reconstruction](https://github.com/umass-amrl/stereo_dense_reconstruction) tool to visualize how the point cloud looks in the robot reference frame and 
+visually align the ground plane with `z=0`.
+
+### 2. Running JPP
+
+JPP can be run in the same way as explained for the exmaple AMRL and KITTI datasets.
+
+## License
+
+This software is released under the [MIT license](LICENSE).
+
