@@ -54,7 +54,7 @@ the `ROS_PACKAGE_PATH` environment variable. To do this, add the following line 
 
 
 ```bash
-$ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/PATH/hitl-slam
+$ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/PATH/hitl-slam:/PATH/hitl-slam/vector_slam_msgs
 ```
 
 Replace `PATH` with the actual path where you have cloned the repository. To compile the source code, run the script `TODO.sh` with the following commands.
@@ -158,5 +158,6 @@ TODO:
 
 ## License
 
+TODO: double check this
 This software is released under the [MIT license](LICENSE).
 
