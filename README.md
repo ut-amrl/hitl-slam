@@ -11,19 +11,15 @@ can be easily modified to fit the needs of a particular project.
 If you use this software in an academic work or find it relevant to your research, kindly cite:
 
 ```
-@inproceedings{ghosh2017joint,
-  doi = { 10.1109/IROS.2017.8202271 },
-  url = { https://www.joydeepb.com/Publications/jpp.pdf },
-  pages = { 1026--1031 },
-  organization = { IEEE },
-  year = { 2017 },
-  booktitle = { Intelligent Robots and Systems (IROS), 2017 IEEE/RSJ International Conference on },
-  author = { Sourish Ghosh and Joydeep Biswas },
-  title = { Joint Perception And Planning For Efficient Obstacle Avoidance Using Stereo Vision },
+@article{nashed2017human,
+  title={Human-in-the-Loop SLAM},
+  author={Nashed, Samer B and Biswas, Joydeep},
+  journal={arXiv preprint arXiv:1711.08566},
+  year={2017}
 }
 ```
 
-Link to paper: [https://www.joydeepb.com/Publications/jpp.pdf](https://www.joydeepb.com/Publications/jpp.pdf)
+Link to paper: [https://arxiv.org/pdf/1711.08566.pdf](https://arxiv.org/pdf/1711.08566.pdf)
 
 ## Dependencies
 
