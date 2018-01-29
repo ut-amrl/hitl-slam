@@ -27,11 +27,11 @@ Link to paper: [https://arxiv.org/pdf/1711.08566.pdf](https://arxiv.org/pdf/1711
 - [cmake](http://www.cmake.org/cmake/resources/software.html)
 - [popt](http://www.freshmeat.sourceforge.net/projects/popt)
 - [CImg](http://www.cimg.eu/)
+- [OpenMP](http://www.openmp.org/)
 - [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu)*
 - [Ceres Solver](http://www.ceres-solver.org/)*
-- [Eigen](http://www.eigen.tuxfamily.org)*
-- [OpenMP](http://www.openmp.org/)*
-- TODO: finish this list
+
+* Denotes dependencies which should be installed by following the install instructions on the respective webpages.
 
 **Note:** Other versions of ROS may work, but this code has only been tested thoroughly on Indigo.
 
