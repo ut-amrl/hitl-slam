@@ -97,7 +97,7 @@ HitL-SLAM can be used on other datasets as well, as long as they are 2D, and bas
 
 ### 2. Convert Data to Homogenous Format
 
-Data conversion tools coming soon.
+<!--- Data conversion tools for common formats coming soon --->
 
 The HitL-SLAM I/O tools included in this source are designed to read from a very particular type of file. The file HitL-SLAM expects contains a string, the `map name`, on the first line, a float or double, the `timestamp`, on the second line, and then an arbitrary number of lines following, each with the identical format:
 
@@ -108,8 +108,8 @@ Pose_x, Pose_y, Pose_th, Obs_x, Obs_y, Normal_x, Normal_y, Covar_xx, Covar_xy, C
 Thus, a trivial example of an input file might look like
 
 ```
-map_name
-timestamp
+StarterMap
+1455656519.379815
 -0.0000,-0.0851,0.0967, -0.2685,-1.2530, -0.0132,0.9999, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000
 -0.0000,-0.0851,0.0967, -0.2627,-1.2529, -0.0913,0.9958, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000
 .
@@ -127,6 +127,12 @@ To execute HitL-SLAM, please see the section titled **Running Human-in-the-Loop 
 
 By default, Human-in-the-Loop SLAM and the accompanying GUI are set up to run as ROS nodes. So, before proceeding, make sure there is a
 `roscore` process running. Next, open two new terminals; one will be used to launch the GUI, and the other will used to run the HitL-SLAM node.
+
+
+
+
+
+
 
 ### 2. Command Line Arguments and Options
 
@@ -157,6 +163,5 @@ TODO: finish and add pictures
 
 ## License
 
-TODO: double check this
-This software is released under the [MIT license](LICENSE).
+This software is released under the [GNU LGPL License](LICENSE).
 
