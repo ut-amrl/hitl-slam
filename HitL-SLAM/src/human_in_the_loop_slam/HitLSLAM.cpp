@@ -152,8 +152,9 @@ void HitLSLAM::addCorrectionPoints(const uint32_t type,
                                    const Eigen::Vector2f mouse_down,
                                    const Eigen::Vector2f mouse_up) {
   CorrectionType correction_type =  static_cast<CorrectionType>(type);
-  if (correction_type != pending_correction_type_ &&
-      isValidCorrectionType(correction_type)) { 
+  if (correction_type == CorrectionType::kUnknownCorrection) { return; }
+  else if (correction_type != pending_correction_type_ &&
+                     isValidCorrectionType(correction_type)) { 
     const auto name_index = static_cast<size_t>(correction_type);
     cout << "Correction mode: " << CorrectionTypeNames[name_index] << endl;
     // Start a new correction type.
@@ -208,7 +209,9 @@ void HitLSLAM::addCorrectionPoints(const uint32_t type,
         // Do nothing.
       } break;
     }
-  correction_type_ = correction_type;
+    const auto name_index = static_cast<size_t>(correction_type);
+    cout << "Assigning correction mode: " << CorrectionTypeNames[name_index] << endl;
+    correction_type_ = correction_type;
   }
 }
 
@@ -369,6 +372,7 @@ void HitLSLAM::Run() {
     prev_poses_ = poses_;
     prev_covariances_ = covariances_;
     SingleInput current_input;
+    printf("correction type: %d\n", static_cast<size_t>(correction_type_));
     current_input.type_of_constraint = correction_type_;
     current_input.input_points = selected_points_;
     current_input.undone = 0;
@@ -445,8 +449,16 @@ void HitLSLAM::Run() {
       //DisplayPoses(poses, init_point_clouds, normal_clouds, save_image_file);
       
     }
+    else {
+      // TODO: error message about backprop
+      //cout << "Erroro: " << endl;
+    }
   }
-    
+  else {
+    cout << "User input was not verified as close to observations" << endl;
+  }
+
+  transformPointCloudsToWorldFrame(); 
   cout << "completed cycle" << endl;
   num_completed_cycles++;
 

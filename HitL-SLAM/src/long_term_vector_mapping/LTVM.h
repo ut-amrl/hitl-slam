@@ -11,7 +11,7 @@ class LongTermVectorMap {
     void Curate(std::vector<perception_2d::Pose2Df> poses,
                 std::vector<perception_2d::PointCloudf> point_clouds,
                 std::vector<perception_2d::NormalCloudf> normal_clouds,
-                Eigen::Affine2f map_transform);
+                const Eigen::Affine2f map_transform);
  
  
 

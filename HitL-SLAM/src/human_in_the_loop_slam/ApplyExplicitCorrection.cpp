@@ -315,8 +315,11 @@ void AppExpCorrect::AddParallelHumanConstraint(
   }
 }
 
-void AppExpCorrect::CalculateExplicitCorrections(vector<CorrectionPair>*
-                                                    corrections) {
+void AppExpCorrect::CalculateExplicitCorrections(
+                                     vector<CorrectionPair>* corrections) {
+  //cout << "corr type: " << correction_type_ << endl;
+  const auto name_index = static_cast<size_t>(correction_type_);
+  cout << "Correction mode in APP EXP: " << CorrectionTypeNames[name_index] << endl;
   switch (correction_type_) {
     case CorrectionType::kPointCorrection : {
       cout << "not currently supported" << endl;

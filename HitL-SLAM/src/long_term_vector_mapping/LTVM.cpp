@@ -76,24 +76,6 @@ void LongTermVectorMap::init() {
 
 }
 
-/* ################################ STRUCTS ################################# */
-
-struct totalPointCloud {
-  PointCloudf point_cloud;
-  NormalCloudf normal_cloud;
-  vector<Pose2Df> poses;
-};
-
-
-struct worldMap {
-  SdfObject sdf;
-  vector<mappingVector> vectorMap;
-};
-
-
-
-
-
 /* ################################ COMPUTE UNCERTAINTY ################################# */
 
 void LongTermVectorMap::resampleSegmentUncertainty(float sigma,
@@ -102,12 +84,10 @@ void LongTermVectorMap::resampleSegmentUncertainty(float sigma,
   vector<float> p1ys;
   vector<float> p2xs;
   vector<float> p2ys;
-  // limit how much we resample for time efficiency
   
+  // limit how much we resample for time efficiency
   int mass = min((*new_vector).mass, 100000);
-  //if (mass > 100000) {
-  //  mass = 100000;
-  //}
+  
   vector<Vector2d> bootstrap;
   Vector2f p1 = (*new_vector).p1;
   Vector2f p2 = (*new_vector).p2;
@@ -125,7 +105,6 @@ void LongTermVectorMap::resampleSegmentUncertainty(float sigma,
       point = p1 + alpha * line_dir + noise * normal;
       bootstrap.push_back(point);
     }
-    //double* data = NULL;
     double* data = new double[2 * mass];
     Vector2d cm(0.0,0.0);
     Vector2d ip;
@@ -178,12 +157,6 @@ void LongTermVectorMap::resampleSegmentUncertainty(float sigma,
     cov_x2y2 += (p2xbar - p2xs[i]) * (p2ybar - p2ys[i]);
     cov_y2y2 += (p2ybar - p2ys[i]) * (p2ybar - p2ys[i]);
   }
-//  cov_x1x1 = cov_x1x1/float(num_samples_);
-//  cov_x1y1 = cov_x1y1/float(num_samples_);
-//  cov_y1y1 = cov_y1y1/float(num_samples_);
-//  cov_x2x2 = cov_x2x2/float(num_samples_);
-//  cov_x2y2 = cov_x2y2/float(num_samples_);
-//  cov_y2y2 = cov_y2y2/float(num_samples_);
 
   Matrix2f p1_cov;
   p1_cov(0,0) = cov_x1x1;
@@ -216,13 +189,10 @@ void LongTermVectorMap::resampleSegmentUncertainty(float sigma,
   new_vector->scatter = Si;
 }
 
-
-
-
-
 void LongTermVectorMap::computeVectorUncertainty(Vector2d p1, Vector2d p2, 
                                                  vector<Vector2d> inlier_points, 
                                                  vector<Pose2Df> poses) {
+  //TODO: move these params to .h
   mappingVector new_vector;
   //number of times to sample points
   int k = 1000;
@@ -425,17 +395,36 @@ double bicubicInterpolate (double I[4][4], double xl[4], double yl[4], double X,
   return cubicInterpolate(arr, xl, X);
 }
 
-totalPointCloud filter(const vector<Pose2Df> poses, PointCloudf point_cloud, NormalCloudf normal_cloud, SdfObject master_sdf) {
-  cimg_library::CImg<float> weights = master_sdf.weights;
-  cimg_library::CImg<float> values = master_sdf.values;
-  Vector2f image_origin = master_sdf.origin;
+void LongTermVectorMap::filter(const vector<Pose2Df> poses, 
+                               vector<PointCloudf>* point_cloud, 
+                               vector<NormalCloudf>* normal_cloud) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  cimg_library::CImg<float> weights = sdf_map_.getWeights();
+  cimg_library::CImg<float> values = sdf_map_.getValues();
+  Vector2f origin = sdf_map_.getOrigin();
+  float image_resolution = sdf_map_.getImageResolution();
   float max_weight = 0.0;
-  for (int x=0; x<weights.width(); x++) {
-    for (int y=0; y<weights.height(); y++) {
+  for (int x = 0; x < weights.width(); x++) {
+    for (int y = 0; y < weights.height(); y++) {
       max_weight = max(weights(x,y), max_weight);
     }
   }
-  double T = 0.95*max_weight;
+  // TODO: move to .h
+  double T = 0.95 * max_weight;
   double D = 0.05;
 
   pair<vector<Pose2Df>, vector<Vector2f> > filtered_pair;
@@ -447,27 +436,31 @@ totalPointCloud filter(const vector<Pose2Df> poses, PointCloudf point_cloud, Nor
     const Vector2f point = point_cloud[i];
     double x = point(0);
     double y = point(1);
-    double cx = ceil( (point(0) - image_origin(0))/map_options_.image_resolution );
-    double fx = floor( (point(0) - image_origin(0))/map_options_.image_resolution );
-    double cy = ceil( (point(1) - image_origin(1))/map_options_.image_resolution );
-    double fy = floor( (point(1) - image_origin(1))/map_options_.image_resolution );
+    double cx = ceil( (point(0) - image_origin(0)) / image_resolution );
+    double fx = floor((point(0) - image_origin(0)) / image_resolution );
+    double cy = ceil( (point(1) - image_origin(1)) / image_resolution );
+    double fy = floor((point(1) - image_origin(1)) / image_resolution );
     if (cx == fx) {cx++;}
     if (cy == fy) {cy++;}
-    double step = map_options_.image_resolution;
+    double step = image_resolution;
     Vector2f patch_origin = image_origin + step * Vector2f(fx-1, fy-1);
 
-    double xl[4] = {patch_origin(0), patch_origin(0)+step, patch_origin(0)+2*step, patch_origin(0)+3*step};
-    double yl[4] = {patch_origin(1), patch_origin(1)+step, patch_origin(1)+2*step, patch_origin(1)+3*step};
+    double xl[4] = {patch_origin(0), patch_origin(0)+step, 
+                    patch_origin(0)+2*step, patch_origin(0)+3*step};
+    double yl[4] = {patch_origin(1), patch_origin(1)+step, 
+                    patch_origin(1)+2*step, patch_origin(1)+3*step};
 
-    double w[4][4] = {{weights(fx-1, cy+1), weights(fx-1, cy), weights(fx-1, fy), weights(fx-1, fy-1)},
-                      {weights(fx, cy+1), weights(fx, cy), weights(fx, fy), weights(fx, fy-1)},
-                      {weights(cx, cy+1), weights(cx, cy), weights(cx, fy), weights(cx, fy-1)},
-                      {weights(cx+1, cy+1), weights(cx+1, cy), weights(cx+1, fy), weights(cx+1, fy-1)}};
+    double w[4][4] = 
+        {{weights(fx-1, cy+1), weights(fx-1, cy), weights(fx-1, fy), weights(fx-1, fy-1)},
+         {weights(fx, cy+1), weights(fx, cy), weights(fx, fy), weights(fx, fy-1)},
+         {weights(cx, cy+1), weights(cx, cy), weights(cx, fy), weights(cx, fy-1)},
+         {weights(cx+1, cy+1), weights(cx+1, cy), weights(cx+1, fy), weights(cx+1, fy-1)}};
 
-    double v[4][4] = {{values(fx-1, cy+1), values(fx-1, cy), values(fx-1, fy), values(fx-1, fy-1)},
-                      {values(fx, cy+1), values(fx, cy), values(fx, fy), values(fx, fy-1)},
-                      {values(cx, cy+1), values(cx, cy), values(cx, fy), values(cx, fy-1)},
-                      {values(cx+1, cy+1), values(cx+1, cy), values(cx+1, fy), values(cx+1, fy-1)}};
+    double v[4][4] = 
+        {{values(fx-1, cy+1), values(fx-1, cy), values(fx-1, fy), values(fx-1, fy-1)},
+         {values(fx, cy+1), values(fx, cy), values(fx, fy), values(fx, fy-1)},
+         {values(cx, cy+1), values(cx, cy), values(cx, fy), values(cx, fy-1)},
+         {values(cx+1, cy+1), values(cx+1, cy), values(cx+1, fy), values(cx+1, fy-1)}};
 
     if (bicubicInterpolate(w,xl,yl,x,y) > T && fabs(bicubicInterpolate(v,xl,yl,x,y)) < D) {
       filtered_pc.push_back(point);
@@ -697,7 +690,7 @@ vector<mappingVector> selfMerge(vector<mappingVector> master_vectorMap, size_t s
 
 
 
-
+// TODO: move params to .h
 // Prune old vectors which are discovered to be STFS. 
 // Resample covariances for any vectors which are updated
 void LongTermVectorMap::pruneVectorMap() {
@@ -712,19 +705,17 @@ void LongTermVectorMap::pruneVectorMap() {
   const Vector2f origin = sdf_map_.getOrigin();
   double step = sdf_map_.getImageResolution();
   float thresh = 0.95*255.0;
-  for (size_t i = 0; i < r_vector_map.size(); i++) {
-    vector<mappingVector> new_components;
+  for (size_t i = 0; i < vector_map_.size(); ++i) {
+    vector<MappingVector> new_vectors;
+    const Vector2d p1 = vector_map_[i].p1;
+    const Vector2d p2 = vector_map_[i].p2;
+    double T = (p2-p1).norm();
+    const Vector2d line_dir = (p2-p1).normalized();
+    Vector2d normal = Perp2(line_dir);
     double t = 0.0;
     double t1(0), t2(0);
     bool high_weight = false;
-    const Vector2d p1 = master_vectorMap[i].p1;
-    const Vector2d p2 = master_vectorMap[i].p2;
-    double T = (p2-p1).norm();
-    const Vector2d line_dir = (p2-p1).normalized();
-    Matrix2d rot;
-    rot << 0, -1, 1, 0;
-    Vector2d normal = rot*line_dir;
-    mappingVector new_component;
+    mappingVector new_vector;
     while (t <= T) {
       Vector2d curr_point = p1 + t*line_dir;
       double x = curr_point(0);
@@ -735,20 +726,19 @@ void LongTermVectorMap::pruneVectorMap() {
         //turn on
         high_weight = true;
         t1 = t;
-        new_component.p1 = curr_point;
+        new_vector.p1 = curr_point;
       }
       else if (weights(ix,iy) < thresh && high_weight) {
-        t2 = t;
         if (int(((t2-t1) / T) * master_vectorMap[i].mass) > 10) {
           //turn off
           high_weight = false;
           t2 = t;
-          new_component.p2 = curr_point;
-          new_component.mass = int(((t2-t1) / T) * master_vectorMap[i].mass);
+          new_vector.p2 = curr_point;
+          new_vector.mass = int(((t2-t1) / T) * master_vectorMap[i].mass);
 
-          resampleSegmentUncertainty(sigma, &new_component);
+          resampleSegmentUncertainty(sigma, &new_vector);
 
-          new_components.push_back(new_component);
+          new_vectors.push_back(new_vector);
         }
       }
       t += step;
@@ -756,33 +746,32 @@ void LongTermVectorMap::pruneVectorMap() {
     //terminated with line
     if (high_weight) {
       //turn off
-      t2 = T;
       // no change to original vector
       if (fabs((t2-t1)-T) < 2*map_options_.image_resolution) {
-        new_master_vector_map.push_back(master_vectorMap[i]);
+        new_master_vector_map.push_back(vector_map_[i]);
       }
       // latter part of line is kept
-      else if (int(((t2-t1) / T) * master_vectorMap[i].mass) > 10) {
-        new_component.p2 = p2;
-        new_component.mass = int(((t2-t1) / T) * master_vectorMap[i].mass);
+      else if (int(((t2-t1) / T) * vector_map_[i].mass) > 10) {
+        t2 = T;
+        new_vector.p2 = p2;
+        new_vector.mass = int(((t2-t1) / T) * vector_map_[i].mass);
 
-        resampleSegmentUncertainty(sigma, &new_component);
+        resampleSegmentUncertainty(sigma, &new_vector);
         
-        new_components.push_back(new_component);
+        new_vectors.push_back(new_vector);
       }
     }
-    for (size_t j=0; j<new_components.size(); j++) {
-      new_master_vector_map.push_back(new_components[j]);
+    for (size_t j = 0; j < new_vectors.size(); j++) {
+      new_master_vector_map.push_back(new_vectors[j]);
     }
   }
-  vector<mappingVector> nmvm;
-  for (size_t i=0; i<new_master_vector_map.size(); i++) {
+  vector_map_.clear();
+  for (size_t i = 0; i < new_master_vector_map.size(); i++) {
     double seg_len = (new_master_vector_map[i].p2 - new_master_vector_map[i].p1).norm();
     if (seg_len > 0.05) {
-      nmvm.push_back(new_master_vector_map[i]);
+      vector_map_.push_back(new_master_vector_map[i]);
     }
   }
-  return nmvm;
 }
 
 
@@ -815,7 +804,7 @@ void LongTermVectorMap::pruneVectorMap() {
 void LongTermVectorMapping::Curate(vector<Pose2Df> poses,
                                    vector<PointCloudf> point_clouds,
                                    vector<NormalCloudf> normal_clouds,
-                                   Affine2f map_transform) {
+                                   const Affine2f map_transform) {
   
   CHECK_GT(point_cloud.size(), 0);
   CHECK_EQ(point_cloud.size(), normal_cloud.size());
@@ -839,8 +828,8 @@ void LongTermVectorMapping::Curate(vector<Pose2Df> poses,
      SignedDistanceFunction new_sdf;
      new_sdf.init(poses, point_clouds);
      sdf_map_.update(new_sdf);
-
-     // TODO: prune
+     pruneVectorMap();
+     // TODO: 
      //       filter
      //       extract
      //       merge
@@ -855,14 +844,10 @@ void LongTermVectorMapping::Curate(vector<Pose2Df> poses,
 
     
 
-    // prune old vectors which are discovered to be STFS. 
-    // resample covariances for any vectors which are updated
-    std::cout << "Update Vector Map" << std::endl;
-    master_vectorMap = pruneVectorMap(master_sdf, master_vectorMap);
     
     // self-contained in LTVM class
     std::cout << "Filter  SDF" << std::endl;
-    totalPointCloud filtered_rpc = filter(poses, point_cloud, normal_cloud, master_sdf);
+    totalPointCloud filtered_rpc = filter(poses, &point_cloud, &normal_cloud);
     
     // RANSAC class
     // TODO: pull out call to estimate uncertainty

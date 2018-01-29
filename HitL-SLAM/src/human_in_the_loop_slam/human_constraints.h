@@ -6,12 +6,12 @@
 
 enum class CorrectionType : uint32_t {
   kUnknownCorrection = 0,
-  kPointCorrection = 1,
-  kLineSegmentCorrection = 2,
-  kCornerCorrection = 3,
-  kColinearCorrection = 4,
-  kPerpendicularCorrection = 5,
-  kParallelCorrection = 7,
+  kPointCorrection = 1,          // ALT        (not supported yet)
+  kLineSegmentCorrection = 2,    // CTRL
+  kCornerCorrection = 3,         // ALT + CTRL (not supported yet)
+  kColinearCorrection = 4,       // SHIFT
+  kPerpendicularCorrection = 5,  // SHIFT + ALT
+  kParallelCorrection = 6,       // CTRL + SHIFT
 };
 
 const std::string CorrectionTypeNames[] = {
