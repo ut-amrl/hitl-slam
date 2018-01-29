@@ -25,30 +25,29 @@ Link to paper: [https://arxiv.org/pdf/1711.08566.pdf](https://arxiv.org/pdf/1711
 
 - A C++ compiler (*e.g.*, [GCC](http://gcc.gnu.org/))
 - [cmake](http://www.cmake.org/cmake/resources/software.html)
-- [popt](http://freecode.com/projects/popt)
-- [libconfig](http://www.hyperrealm.com/libconfig/libconfig.html)
-- [Boost](http://www.boost.org/)
-- [OpenCV](https://github.com/opencv/opencv)
-- [OpenMP](http://www.openmp.org/)
+- [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu)
+- TODO: finish this list - ceres, cimg,  
+
+**Note:** Other versions of ROS may work, but this code has only been tested thoroughly on Indigo.
 
 Use the following command to install dependencies:
 
 ```bash
-$ sudo apt-get install g++ cmake libpopt-dev libconfig-dev libboost-all-dev libopencv-dev python-opencv gcc-multilib
+$ sudo apt-get install TODO
 ```
 
-For compiling and running the ROS wrapper, install [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu).
 
 ## Compiling
 
-### 1. Building JPP libraries and binaries
+### 1. Building HiTL-SLAM
 
 Clone the repository:
 
 ```bash
-$ git clone https://github.com/umass-amrl/jpp
+$ git clone https://github.com/umass-amrl/hitl-slam
 ```
 
+need to do the following: 
 The script `build.sh` compiles the JPP library:
 
 ```bash
@@ -57,7 +56,7 @@ $ chmod +x build.sh
 $ ./build.sh
 ```
 
-### 2. Building JPP ROS
+### 2. combine this section with the above
 
 For compiling the ROS wrapper, `rosbuild` is used. Add the path of the ROS wrapper to `ROS_PACKAGE_PATH` and put the following line in your `.bashrc` file. 
 Replace `PATH` by the actual path where you have cloned the repository:
@@ -72,8 +71,9 @@ Execute the `build_ros.sh` script:
 $ chmod +x build_ros.sh
 $ ./build_ros.sh
 ```
+## Running Human-in-the-Loop SLAM on Example Data
 
-## Running JPP on AMRL and KITTI Datasets
+## Running Human-in-the-Loop SLAM on Standard Data
 
 ### 1. Download Datasets
 
