@@ -1,10 +1,8 @@
 TODO:
 
+update citation / links once published
+
 refactor code
-
-remove dead code
-
-new rosmsg names 
 
 test on clean OS to determine necessary libraries
 
