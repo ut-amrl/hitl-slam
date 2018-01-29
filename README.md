@@ -25,17 +25,20 @@ Link to paper: [https://arxiv.org/pdf/1711.08566.pdf](https://arxiv.org/pdf/1711
 
 - A C++ compiler (*e.g.*, [GCC](http://gcc.gnu.org/))
 - [cmake](http://www.cmake.org/cmake/resources/software.html)
-- [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu)
-- [Ceres Solver](http://www.ceres-solver.org/)
+- [popt](http://www.freshmeat.sourceforge.net/projects/popt)
 - [CImg](http://www.cimg.eu/)
-- TODO: finish this list  
+- [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu)*
+- [Ceres Solver](http://www.ceres-solver.org/)*
+- [Eigen](http://www.eigen.tuxfamily.org)*
+- [OpenMP](http://www.openmp.org/)*
+- TODO: finish this list
 
 **Note:** Other versions of ROS may work, but this code has only been tested thoroughly on Indigo.
 
 Use the following command to install dependencies:
 
 ```bash
-$ sudo apt-get install cimg-dev TODO: finish
+$ sudo apt-get install g++ cmake libpopt-dev cimg-dev TODO: finish
 ```
 
 
@@ -54,13 +57,20 @@ the `ROS_PACKAGE_PATH` environment variable. To do this, add the following line 
 
 
 ```bash
-$ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/PATH/hitl-slam:/PATH/hitl-slam/vector_slam_msgs
+$ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/PATH/hitl-slam/HitL-SLAM:/PATH/hitl-slam/vector_slam_msgs
 ```
 
-Replace `PATH` with the actual path where you have cloned the repository. To compile the source code, run the script `TODO.sh` with the following commands.
+Replace `PATH` with the actual path where you have cloned the repository. To compile the source code, run the following commands.
 
 ```bash
-$ cd TODO
+$ cd ~/PATH_TO/hitl-slam/vector_slam_msgs
+$ make
+$ cd ~/PATH_TO/hitl-slam/HitL-SLAM/
+$ mkdir build
+$ cd build
+$ cmake ..
+$ cd ../
+$ make
 ```
 
 ## Using Human-in-the-Loop SLAM on Example Data
