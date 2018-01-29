@@ -75,7 +75,6 @@ $ cd ~/PATH_TO/hitl-slam/HitL-SLAM/
 $ mkdir build
 $ cd build
 $ cmake ..
-$ cd ../
 $ make
 ```
 
