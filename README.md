@@ -31,7 +31,7 @@ Link to paper: [https://arxiv.org/pdf/1711.08566.pdf](https://arxiv.org/pdf/1711
 - [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu)*
 - [Ceres Solver](http://www.ceres-solver.org/)*
 
-* Denotes dependencies which should be installed by following the install instructions on the respective webpages.
+The * denotes dependencies which should be installed by following the install instructions on the respective webpages.
 
 **Note:** Other versions of ROS may work, but this code has only been tested thoroughly on Indigo.
 
@@ -43,7 +43,7 @@ $ sudo apt-get install g++ cmake libpopt-dev cimg-dev
 
 ## Compiling
 
-### 1. Building HiTL-SLAM
+### 1. ROS Environment Setup
 
 `cd` to the directory where you want to install Human-in-the-Loop SLAM, and clone the repository.
 
@@ -59,7 +59,11 @@ the `ROS_PACKAGE_PATH` environment variable. To do this, add the following line 
 $ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/PATH/hitl-slam/HitL-SLAM:/PATH/hitl-slam/vector_slam_msgs
 ```
 
-Replace `PATH` with the actual path where you have cloned the repository. To compile the source code, run the following commands.
+Replace `PATH` with the actual path where you have cloned the repository. 
+
+### 2. Compiling HiTL-SLAM Source
+
+To compile the source code, run the following commands.
 
 ```bash
 $ cd ~/PATH_TO/hitl-slam/vector_slam_msgs
