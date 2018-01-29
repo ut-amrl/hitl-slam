@@ -92,12 +92,12 @@ $ make
 
 ## Using Human-in-the-Loop SLAM on Example Data
 
-TODO: find out where / how to host AMRL / LGRC data
-
 ### 1. Download Datasets
 
-Example data collected at University of MAssachusetts Amherst, and used in the corresponding paper can be found 
-[here](TODO). Once downloaded, move the files into a directory of your choice, for example: 
+Example data collected at University of Massachusetts Amherst, and used in the corresponding paper can be found 
+[here](https://greyhound.cs.umass.edu/owncloud/index.php/apps/files/?dir=/laser_datasets/HitL_datasets/). In particular,
+some of the following examples will use data from the file `2016-02-16-16-01-46.bag.stfs.covars` which can be found in the 
+`Figure8` subdirectory within `/HitL_datasets`. Once downloaded, move the files into a directory of your choice, for example: 
 `hitl-slam/HitL-SLAM/exampledata/`.
 
 To execute HitL-SLAM, please see the section titled **Running Human-in-the-Loop SLAM**.
