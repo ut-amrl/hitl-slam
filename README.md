@@ -54,7 +54,6 @@ $ git clone https://github.com/umass-amrl/hitl-slam
 For compiling the ROS wrapper, `rosbuild` is used. `rosbuild` requires the path of the ROS wrapper to be added to 
 the `ROS_PACKAGE_PATH` environment variable. To do this, add the following line in your `.bashrc` file. 
 
-
 ```bash
 $ export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/PATH/hitl-slam/HitL-SLAM:/PATH/hitl-slam/vector_slam_msgs
 ```
@@ -78,18 +77,6 @@ $ cmake ..
 $ make
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
 ## Using Human-in-the-Loop SLAM on Example Data
 
 ### 1. Download Datasets
@@ -102,21 +89,37 @@ some of the following examples will use data from the file `2016-02-16-16-01-46.
 
 To execute HitL-SLAM, please see the section titled **Running Human-in-the-Loop SLAM**.
 
-## Using Human-in-the-Loop SLAM on Standard Data
+## Using Human-in-the-Loop SLAM on Standard Data or Your Own Data
 
 ### 1. Download Datasets
 
-TODO: add links to some standard data
+HitL-SLAM can be used on other datasets as well, as long as they are 2D, and based on depth scans or depth images. Many well-known datasets of this nature can be found [here](http://cres.usc.edu/radishrepository/view-all.php). After downloading a dataset or generating some data yourself, it needs to be put into the right format.
 
-### 2. Converting Data to Homogenous Format
+### 2. Convert Data to Homogenous Format
 
-TODO: add instructions for using data conversion tools
+Data conversion tools coming soon.
 
-## Using Human-in-the-Loop SLAM on Your Own Data
+The HitL-SLAM I/O tools included in this source are designed to read from a very particular type of file. The file HitL-SLAM expects contains a string, the `map name`, on the first line, a float or double, the `timestamp`, on the second line, and then an arbitrary number of lines following, each with the identical format:
 
-### 1. Convert Data to Homogenous Format
+```
+Pose_x, Pose_y, Pose_th, Obs_x, Obs_y, Normal_x, Normal_y, Covar_xx, Covar_xy, Covar_xth, Covar_yx, Covar_yy, Covar_yth, Covar_thx, Covar_thy, Covar_thth
+```
 
-TODO: add instructions for using data conversion tools
+Thus, a trivial example of an input file might look like
+
+```
+map_name
+timestamp
+-0.0000,-0.0851,0.0967, -0.2685,-1.2530, -0.0132,0.9999, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000
+-0.0000,-0.0851,0.0967, -0.2627,-1.2529, -0.0913,0.9958, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000
+.
+.
+.
+38.2454,-4.9589,-3.0867, 37.3000,-3.9542, 0.2121,-0.9772, 0.000703, 0.000008, 0.000009, 0.000008, 0.000714, -0.000150, 0.000009, -0.000150, 0.000117
+38.2454,-4.9589,-3.0867, 37.2950,-3.9569, 0.3310,-0.9436, 0.000703, 0.000008, 0.000009, 0.000008, 0.000714, -0.000150, 0.000009, -0.000150, 0.000117
+```
+
+To execute HitL-SLAM, please see the section titled **Running Human-in-the-Loop SLAM**.
 
 ## Running Human-in-the-Loop SLAM
 
@@ -127,7 +130,6 @@ By default, Human-in-the-Loop SLAM and the accompanying GUI are set up to run as
 
 ### 2. Command Line Arguments and Options
 
-TODO: finish
 After compilation, the `HitL_SLAM` and `localization_gui` executables are stored in the `bin/` directory. 
 
 
