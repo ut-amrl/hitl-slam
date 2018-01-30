@@ -105,7 +105,7 @@ The HitL-SLAM I/O tools included in this source are designed to read from a very
 Pose_x, Pose_y, Pose_th, Obs_x, Obs_y, Normal_x, Normal_y, Covar_xx, Covar_xy, Covar_xth, Covar_yx, Covar_yy, Covar_yth, Covar_thx, Covar_thy, Covar_thth
 ```
 
-Thus, a trivial example of an input file might look like
+Thus, an example of an input file might look like
 
 ```
 StarterMap
