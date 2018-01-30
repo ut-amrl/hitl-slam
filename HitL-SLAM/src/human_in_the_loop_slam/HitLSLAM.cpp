@@ -95,14 +95,10 @@ using std::sort;
 using std::string;
 using std::vector;
 
-// TODO: fix double - float mismatch with covariance matrices
+// TODO: 
 //       deal with reading from input log for replay
 //       get covar from ceres (JO)
  
-//HitLSLAM::HitLSLAM() {}
-
-//HitLSLAM::~HitLSLAM() {}
-
 void HitLSLAM::init(const vector<Pose2Df> odom,
                     const vector<PointCloudf> rob_frame_pcs,
                     const vector<NormalCloudf> norm_clouds,

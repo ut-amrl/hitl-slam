@@ -300,14 +300,6 @@ totalPointCloud loadPoints() {
 
 
 
-void transformMap(Affine2f transform) {
-  for (size_t i=0; i<point_cloud.size(); i++) {
-    point_cloud[i] = R*point_cloud[i] + T;
-    poses[i].translation = R*poses[i].translation + T;
-    normal_cloud[i] = R*normal_cloud[i] + T;
-  }
-}
-
 int main(int argc, char** argv) {
 //  printf("Probabilistic Object Map Builder\n");
   signal(SIGINT,HandleStop);
@@ -356,17 +348,30 @@ int main(int argc, char** argv) {
   
   LongTermVectorMap ltvm;
   ltvm.init();
-//TODO: normal clouds?
+  
   vector<Pose2Df> poses;
   vector<PointCloudf> point_clouds;
   vector<NormalCloudf> normal_clouds;
-  Affine2f transform;
+  Rotation2Df map_rotation;
+  Translation2f map_translation;
   for (int i = 0; i < num_maps; ++i) {
     poses.clear();
     point_clouds.clear();
-    loadMap(map_files[i], &poses, &point_clouds);
-    transform = loadTransform(transform_files[i]);
-  //TODO: update instance as required
+    normal_clouds.clear();
+    loadMap(map_files[i], &poses, &point_clouds, &normal_clouds);
+    loadTransform(transform_files[i], &map_rotation, &map_translation);
+    
+    // Transform everything into the given global frame
+    for (size_t i = 0; i < point_cloud.size(); i++) {
+      poses[i].translation = map_rotation * poses[i].translation + map_translation;
+      for (size_t j = 0; j < point_cloud[i].size(); ++j) {
+        point_cloud[i][j] = map_rotation * point_cloud[i][j] + map_translation;
+        normal_cloud[i][j] = map_rotation * normal_cloud[i][j] + map_translation;
+      }
+    }
+    
+    ltvm.Curate(poses, point_clouds, normal_clouds);
+    //TODO: update instance as required
     
   }
 

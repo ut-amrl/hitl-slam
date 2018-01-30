@@ -1,3 +1,6 @@
+#include "RANSAC.h"
+#include "sdf_vector_maps.h"
+
 void LocalSequentialRANSAC::setParameters() {
 
 
@@ -63,7 +66,12 @@ vector<Vector2d> LocalSequentialRANSAC::segFit(double* p1, double* p2, double* c
 }
 
 
-vector<mappingVector> LocalSequentialRANSAC::Run(vector<Pose2Df> poses, vector<Vector2f> point_cloud, NormalCloudf normal_cloud) {
+void LocalSequentialRANSAC::Run(vector<Pose2Df> poses, 
+                                PointCloudf point_cloud, 
+                                NormalCloudf normal_cloud) {
+
+
+
   vector<mappingVector> new_vectors;
 
   vector<Vector2d> used;
@@ -82,6 +90,7 @@ vector<mappingVector> LocalSequentialRANSAC::Run(vector<Pose2Df> poses, vector<V
     maxy = max(working_set[i](1), maxy);
   }
   vector<Vector2d> model;
+  // TODO: move params to .h
   //standard deviation in sensed data in meters
   double sigma = .04;
   //inlier threshold necessary to fit
@@ -136,7 +145,8 @@ vector<mappingVector> LocalSequentialRANSAC::Run(vector<Pose2Df> poses, vector<V
     vector<Pose2Df> inlier_poses;
     Vector2d p1;
     Vector2d p2;
-    Vector2d norm_model = (new_model.first-new_model.second)/(new_model.first-new_model.second).norm();
+    Vector2d norm_model = (new_model.first-new_model.second) / 
+                          (new_model.first-new_model.second).norm();
     for (int i=0; i<N; i++) {
       Vector2d point = working_set[i];
       Vector2d source = Vector2d(poses[i].translation(0), poses[i].translation(1));

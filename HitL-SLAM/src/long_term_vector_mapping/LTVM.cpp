@@ -396,22 +396,8 @@ double bicubicInterpolate (double I[4][4], double xl[4], double yl[4], double X,
 }
 
 void LongTermVectorMap::filter(const vector<Pose2Df> poses, 
-                               vector<PointCloudf>* point_cloud, 
-                               vector<NormalCloudf>* normal_cloud) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                               vector<PointCloudf>* point_clouds, 
+                               vector<NormalCloudf>* normal_clouds) {
 
   cimg_library::CImg<float> weights = sdf_map_.getWeights();
   cimg_library::CImg<float> values = sdf_map_.getValues();
@@ -427,53 +413,47 @@ void LongTermVectorMap::filter(const vector<Pose2Df> poses,
   double T = 0.95 * max_weight;
   double D = 0.05;
 
-  pair<vector<Pose2Df>, vector<Vector2f> > filtered_pair;
-  vector<Vector2f> filtered_pc;
-  vector<Vector2f> filtered_normals;
-  vector<Pose2Df> filtered_poses;
+  for (size_t i = 0; i < point_clouds->size(); i++) {
+    PointCloudf filtered_point_cloud;
+    NormalCloudf filtered_normal_cloud;
+    for (size_t j = 0; j < (*point_clouds)[i].size(); ++j) {
+      const Vector2f point = (*point_clouds)[i][j];  
+      double x = point(0);
+      double y = point(1);
+      double cx = ceil( (point(0) - image_origin(0)) / image_resolution );
+      double fx = floor((point(0) - image_origin(0)) / image_resolution );
+      double cy = ceil( (point(1) - image_origin(1)) / image_resolution );
+      double fy = floor((point(1) - image_origin(1)) / image_resolution );
+      if (cx == fx) {cx++;}
+      if (cy == fy) {cy++;}
+      double step = image_resolution;
+      Vector2f patch_origin = origin + step * Vector2f(fx-1, fy-1);
 
-  for (size_t i = 0; i < point_cloud.size(); i++) {
-    const Vector2f point = point_cloud[i];
-    double x = point(0);
-    double y = point(1);
-    double cx = ceil( (point(0) - image_origin(0)) / image_resolution );
-    double fx = floor((point(0) - image_origin(0)) / image_resolution );
-    double cy = ceil( (point(1) - image_origin(1)) / image_resolution );
-    double fy = floor((point(1) - image_origin(1)) / image_resolution );
-    if (cx == fx) {cx++;}
-    if (cy == fy) {cy++;}
-    double step = image_resolution;
-    Vector2f patch_origin = image_origin + step * Vector2f(fx-1, fy-1);
+      double xl[4] = {patch_origin(0), patch_origin(0)+step, 
+                      patch_origin(0)+2*step, patch_origin(0)+3*step};
+      double yl[4] = {patch_origin(1), patch_origin(1)+step, 
+                      patch_origin(1)+2*step, patch_origin(1)+3*step};
 
-    double xl[4] = {patch_origin(0), patch_origin(0)+step, 
-                    patch_origin(0)+2*step, patch_origin(0)+3*step};
-    double yl[4] = {patch_origin(1), patch_origin(1)+step, 
-                    patch_origin(1)+2*step, patch_origin(1)+3*step};
+      double w[4][4] = 
+          {{weights(fx-1, cy+1), weights(fx-1, cy), weights(fx-1, fy), weights(fx-1, fy-1)},
+           {weights(fx, cy+1), weights(fx, cy), weights(fx, fy), weights(fx, fy-1)},
+           {weights(cx, cy+1), weights(cx, cy), weights(cx, fy), weights(cx, fy-1)},
+           {weights(cx+1, cy+1), weights(cx+1, cy), weights(cx+1, fy), weights(cx+1, fy-1)}};
 
-    double w[4][4] = 
-        {{weights(fx-1, cy+1), weights(fx-1, cy), weights(fx-1, fy), weights(fx-1, fy-1)},
-         {weights(fx, cy+1), weights(fx, cy), weights(fx, fy), weights(fx, fy-1)},
-         {weights(cx, cy+1), weights(cx, cy), weights(cx, fy), weights(cx, fy-1)},
-         {weights(cx+1, cy+1), weights(cx+1, cy), weights(cx+1, fy), weights(cx+1, fy-1)}};
+      double v[4][4] = 
+          {{values(fx-1, cy+1), values(fx-1, cy), values(fx-1, fy), values(fx-1, fy-1)},
+           {values(fx, cy+1), values(fx, cy), values(fx, fy), values(fx, fy-1)},
+           {values(cx, cy+1), values(cx, cy), values(cx, fy), values(cx, fy-1)},
+           {values(cx+1, cy+1), values(cx+1, cy), values(cx+1, fy), values(cx+1, fy-1)}};
 
-    double v[4][4] = 
-        {{values(fx-1, cy+1), values(fx-1, cy), values(fx-1, fy), values(fx-1, fy-1)},
-         {values(fx, cy+1), values(fx, cy), values(fx, fy), values(fx, fy-1)},
-         {values(cx, cy+1), values(cx, cy), values(cx, fy), values(cx, fy-1)},
-         {values(cx+1, cy+1), values(cx+1, cy), values(cx+1, fy), values(cx+1, fy-1)}};
-
-    if (bicubicInterpolate(w,xl,yl,x,y) > T && fabs(bicubicInterpolate(v,xl,yl,x,y)) < D) {
-      filtered_pc.push_back(point);
-      filtered_poses.push_back(poses[i]);
-      filtered_normals.push_back(normal_cloud[i]);
-    }
-  }
-
-  totalPointCloud pc;
-  pc.point_cloud = filtered_pc;
-  pc.poses = filtered_poses;
-  pc.normal_cloud = filtered_normals;
-  return pc;
+      if (bicubicInterpolate(w,xl,yl,x,y) > T && fabs(bicubicInterpolate(v,xl,yl,x,y)) < D) {
+        filtered_point_cloud.push_back(point);
+        filtered_normal_cloud.push_back(normal_cloud[i]);
+      }
+    } // loop over points
+    point_clouds[i] = filtered_point_cloud;
+    normal_clouds[i] = filtered_normal_cloud;
+  } // loop over clouds
 }
 
 
@@ -803,24 +783,16 @@ void LongTermVectorMap::pruneVectorMap() {
 
 void LongTermVectorMapping::Curate(vector<Pose2Df> poses,
                                    vector<PointCloudf> point_clouds,
-                                   vector<NormalCloudf> normal_clouds,
-                                   const Affine2f map_transform) {
+                                   vector<NormalCloudf> normal_clouds) {
   
   CHECK_GT(point_cloud.size(), 0);
   CHECK_EQ(point_cloud.size(), normal_cloud.size());
   CHECK_EQ(point_cloud.size(), poses.size());
 
-  // Transform everying into the given global frame
-  for (size_t i=0; i<point_cloud.size(); i++) {
-    point_cloud[i] = R*point_cloud[i] + T;
-    poses[i].translation = R*poses[i].translation + T;
-    normal_cloud[i] = R*normal_cloud[i] + T;
-  }
-
   if (!sdf_init_) {
      sdf_map_.init(poses, point_clouds);
      sdf_init_ = true;
-
+ 
      //TODO: filter
      //      extract
   }
@@ -833,21 +805,20 @@ void LongTermVectorMapping::Curate(vector<Pose2Df> poses,
      //       filter
      //       extract
      //       merge
-     //       prune
+     pruneVectorMap();
      //       selfmerge
   }
 
 
 
 
-  if (mode == 4) {
 
     
 
     
     // self-contained in LTVM class
     std::cout << "Filter  SDF" << std::endl;
-    totalPointCloud filtered_rpc = filter(poses, &point_cloud, &normal_cloud);
+    filterObservations(poses, &point_cloud, &normal_cloud);
     
     // RANSAC class
     // TODO: pull out call to estimate uncertainty
@@ -859,23 +830,10 @@ void LongTermVectorMapping::Curate(vector<Pose2Df> poses,
     std::cout << "Merge New Lines" << std::endl;
     master_vectorMap = mergeNewVectors(new_vectors, master_vectorMap, false);
     
-    // prune old vectors which are discovered to be STFS. 
-    // resample covariances for any vectors which are updated
-    std::cout << "Update Vector Map" << std::endl;
-    master_vectorMap = pruneVectorMap(master_sdf, master_vectorMap);
-    
     // Recursivley call mergeNewVectors in order to merge any vectors
     // which remain very similar. This is necessary since mapping from
     // new vectors to existing ones has no onto / on-to-one guarantee.
     std::cout << "Self Merge" << std::endl;
     master_vectorMap = selfMerge(master_vectorMap, master_vectorMap.size());
-  }
-
-
-  worldMap WM;
-  WM.sdf = master_sdf;
-  WM.vectorMap = master_vectorMap;
-  return WM;
 
 }
-

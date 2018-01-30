@@ -1,10 +1,12 @@
 class LocalSequentialRANSAC {
   public:
     void setParameters();
+    //TODO: params - getting / setting
     std::vector<std::pair<Eigen::Vector2f, Eigen::Vector2f>> Run(
         std::vector<perception_2d::Pose2Df> poses, 
         std::vector<Eigen::Vector2f> point_cloud, 
         perception_2d::NormalCloudf normal_cloud);
+
     std::vector<Eigen::Vector2d> segFit(double* p1, double* p2, 
                                         double* cm, double* data, 
                                         int size); 
@@ -49,8 +51,6 @@ class LocalSequentialRANSAC {
     };
 
   private:
-    
-
     Eigen::Vector2d closestPoint(Eigen::Vector2d pstar, 
                                  Eigen::Vector2d ps, 
                                  Eigen::Vector2d p);
@@ -59,18 +59,6 @@ class LocalSequentialRANSAC {
                          Eigen::Vector2d p, Eigen::Vector2d pdir);
     
     double distToLine(Eigen::Vector2d v, Eigen::Vector2d w, Eigen::Vector2d p);
-
-
-
-
-
-
-
-    
-
-
-    
-  
 
 };
 
