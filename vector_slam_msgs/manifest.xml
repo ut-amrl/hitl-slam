@@ -1,10 +1,10 @@
 <package>
-  <description brief="cobot_msgs">
+  <description brief="vector_slam_msgs">
 
      Messages and Services of CoBot Software stack
 
   </description>
-  <author>Joydeep Biswas</author>
+  <author>Samer Nashed</author>
   <license>LGPLv3.0</license>
   <review status="unreviewed" notes=""/>
   <url></url>
