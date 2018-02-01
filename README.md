@@ -156,7 +156,7 @@ Humain-in-the-Loop sessions will automatically be logged. Logs are written when 
 
 ### 4. Entering Corrections
 
-To make corrections, first make sure you are focused on the GUI window. Press the `p` key to enter 'provide correction mode'. Once in this mode hold down one or more of the correction type specifier keys, and select the two features you wish to relate. Once you are done, press the `p` key again to trigger the algorithm in full.
+To make corrections, first make sure you are focused on the GUI window. Press the `p` key to enter 'provide correction mode'. Once in this mode hold down one or more of the correction type specifier keys, and select the two features you wish to relate by clicking and dragging with the mouse. Once you are done, press the `p` key again to trigger the algorithm in full.
 
 Correction Type Specifier Key Combinations:
 ```
