@@ -28,12 +28,12 @@ Link to paper: [https://arxiv.org/pdf/1711.08566.pdf](https://arxiv.org/pdf/1711
 - [popt](http://www.freshmeat.sourceforge.net/projects/popt)
 - [CImg](http://www.cimg.eu/)
 - [OpenMP](http://www.openmp.org/)
-- [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu)*
+- [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu)* or later
 - [Ceres Solver](http://www.ceres-solver.org/)*
 
 The * denotes dependencies which should be installed by following the install instructions on the respective webpages.
 
-**Note:** Other versions of ROS may work, but this code has only been tested thoroughly on Indigo.
+**Note:** Previous versions of ROS may work, but this code has only been tested thoroughly on Indigo and later distributions.
 
 Use the following command to install dependencies:
 
