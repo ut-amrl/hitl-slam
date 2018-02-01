@@ -152,7 +152,7 @@ For a full example of all main HitL-SLAM features, see the **Example Usage** sec
 
 ### 3. Logging and Replaying
 
-Humain-in-the-Loop sessions will automatically be logged. Logs are written when the node receives a CTRL-C signal. Logs can be loaded and replayed using the `-L` option in addition to the `-P` option. once loaded, pressing `l` while in the GUI will step through the log, one correction at a time. After the log has played back fully, the user can resume making corrections.
+Humain-in-the-Loop sessions will automatically be logged. Logs are written when the node receives a CTRL-C signal. Logs can be loaded and replayed using the `-L` option in addition to the `-P` option. Once loaded, pressing `l` while in the GUI will step through the log, one correction at a time. After the log has played back fully, the user can resume making corrections.
 
 ### 4. Entering Corrections
 
