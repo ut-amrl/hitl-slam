@@ -131,6 +131,8 @@ char* pose_graph_file_ = NULL;
 
 char* log_file_ = NULL;
 
+char* save_file_ = NULL;
+
 bool replay_mode_ = false;
 
 vector<SingleInput> input_log_;
@@ -565,25 +567,23 @@ void DisplayPoses() {
 
 
 
-/*
 
-void SaveLoggedPoses(const string& filename,
-                     const vector<Pose2Df>& logged_poses,
-                     const vector<double>& timestamps) {
-  ScopedFile fid(filename, "w");
-  for (size_t i = 0; i < logged_poses.size(); ++i) {
-    fprintf(fid(), "%f %f %f %f\n",
-            timestamps[i],
-            logged_poses[i].translation.x(),
-            logged_poses[i].translation.y(),
-            logged_poses[i].angle);
+
+void saveHitLResults(const string file_name) {
+  ScopedFile fid(file_name, "w");
+  vector<Pose2Df> poses = hitl_slam_session_.getPoses();
+  for (size_t i = 0; i < poses.size(); ++i) {
+    fprintf(fid(), "%f %f %f\n",
+            poses[i].translation.x(),
+            poses[i].translation.y(),
+            poses[i].angle);
   }
 }
 
 
 
 
-
+/*
 //transform point clouds and save them in WORLD FRAME
 void SaveStfsandCovars(
     const string& map_name,
@@ -871,34 +871,16 @@ void KeyboardRequestCallback(const vector_slam_msgs::GuiKeyboardEvent& msg) {
     else {
       cout << "Undo not allowed in log replay mode." << endl;
     }
-  }/*
+  }
   else if (msg.keycode == 0x56) { //key code 86, 'v' for save
-    cout << "Are you sure you want to save? (y/n)" << endl;
-    string s;
-    std::cin >> s;
-    if (s == "y") {
-      cout << "time to save!" << endl;
-      message_timestamps_.push_back(0.0);
-      CHECK_GT(message_timestamps_.size(), 0);
-    //SaveLoggedPoses(string(bag_file) + ".poses", poses, message_timestamps_);
-      SaveLoggedPoses("test.poses", poses, message_timestamps_);
-      if (save_stfs_) {
-        SaveStfsandCovars(kMapName,
-                poses,
-                init_point_clouds,
-                normal_clouds,
-                "test.poses",
-                message_timestamps_.front());
-        SaveStfs(kMapName,
-                poses,
-                init_point_clouds,
-                normal_clouds,
-                "test.poses",
-                message_timestamps_.front());
-      }
-      cout << "time to ctrl-C!" << endl;
+    if (save_file_ == NULL) {
+      saveHitLResults("hitl_results.txt");
     }
-  }*/
+    else {
+      saveHitLResults(string(save_file_));
+    }
+    cout << "It is now safe to ctrl-C" << endl; 
+  }
   else if (msg.keycode == 0x4C) { //key code 76, 'l' for log
     cout << "step ahead log" << endl;
     if (replay_mode_) {
@@ -970,6 +952,8 @@ int main(int argc, char** argv) {
         "Load existing pose-graph file", "STRING"},
     { "load-recording", 'L', POPT_ARG_STRING, &log_file_, 1,
         "Load existing log file", "STRING"},
+    { "save-file-name", 'V', POPT_ARG_STRING, &save_file_, 1,
+        "Desired save file name", "STRING"},
     POPT_AUTOHELP
     { NULL, 0, 0, NULL, 0, NULL, NULL }
   };
