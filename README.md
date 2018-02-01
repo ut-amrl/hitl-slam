@@ -128,12 +128,6 @@ To execute HitL-SLAM, please see the section titled **Running Human-in-the-Loop 
 By default, Human-in-the-Loop SLAM and the accompanying GUI are set up to run as ROS nodes. So, before proceeding, make sure there is a
 `roscore` process running. Next, open two new terminals; one will be used to launch the GUI, and the other will used to run the HitL-SLAM node.
 
-
-
-
-
-
-
 ### 2. Command Line Arguments and Options
 
 After compilation, the `HitL_SLAM` and `localization_gui` executables will show up in the `bin/` directory. To start the GUI, in a new terminal run the `localization_gui` executable.
@@ -158,25 +152,42 @@ For a full example of all main HitL-SLAM features, see the **Example Usage** sec
 
 ### 3. Logging and Replaying
 
-TODO: fill out
+Humain-in-the-Loop sessions will automatically be logged. Logs are written when the node receives a CTRL-C signal. Logs can be loaded and replayed using the `-L` option in addition to the `-P` option. once loaded, pressing `l` while in the GUI will step through the log, one correction at a time. After the log has played back fully, the user can resume making corrections.
 
-### 4. Saving Output Data
+### 4. Entering Corrections
 
-TODO: finish
+To make corrections, first make sure you are focused on the GUI window. Press the `p` key to enter 'provide correction mode'. Once in this mode hold down one or more of the correction type specifier keys, and select the two features you wish to relate. Once you are done, press the `p` key again to trigger the algorithm in full.
 
-### 5. Example Usage
+Correction Type Specifier Key Combinations:
+```
+CTRL = Colocation
+SHIFT = Collinear
+SHIFT + ALT = Perpendicular
+SHIFT + CTRL = Parallel
+```
+
+### 5. Undoing a Correction
+
+If you don't like the outcome of a given correction, you can undo it by pressing the `u` key while in the GUI. This reverts the pose and covariance estimates to their previous state, and removes the most recent set of human correction factors from the factor graph.
+
+### 6. Saving Output Data
+
+To save the pose estimates, press the `v` key while in the GUI. The pose estimates will be written to a default output file `hitl_results.txt`. To specify a file name to save to, use the `-V` command line option followed by the desired file name.
+
+### 7. Example Usage
 
 TODO: start up, make a correction, log it, quit, load a log, replay, make a second correction, undo it, do it again, save
 
-
+<!---
 |Confidence match visualizations | Path visualization        |
 |:------------------------------:|:-------------------------:|
 |![](dumps/astar7-vis.jpg)       | ![](dumps/astar7-path.jpg)|
-
-
+--->
+<!---
 |Confidence match visualizations | Path visualization        |
 |:------------------------------:|:-------------------------:|
 |![](dumps/rrt73-vis.jpg)        | ![](dumps/rrt73-path.jpg) |
+--->
 
 ## License
 
