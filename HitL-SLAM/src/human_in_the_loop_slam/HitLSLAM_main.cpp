@@ -19,14 +19,11 @@
 
 
 //TODO: 
-//      save files
+//      how to resume logging
 //      load config
-//      viz / gui
-//      log logic
-//      replay logic
-//      undo logic
 //      load odom correctly
-//      load odom quick fix
+
+//      save files
 
 
 
@@ -54,7 +51,6 @@
 
 #include "eigen_helper.h"
 #include "helpers.h"
-//#include "../../extern_libraries/CImg/CImg.h"
 #include "glog/logging.h"
 #include "ceres/ceres.h"
 #include "vector_slam_msgs/CobotEventsMsg.h"
@@ -135,6 +131,11 @@ char* pose_graph_file_ = NULL;
 
 char* log_file_ = NULL;
 
+bool replay_mode_ = false;
+
+vector<SingleInput> input_log_;
+
+int current_log_index_ = 0;
 
 // Display message for drawing debug vizualizations on the localization_gui.
 vector_slam_msgs::LidarDisplayMsg display_message_;
@@ -169,32 +170,6 @@ HitLSLAM hitl_slam_session_;
 bool correction_mode_on_ = false;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 static const uint32_t kTrajectoryColor = 0x7F000000;
 static const uint32_t kPoseCovarianceColor = 0xFF808080;
 static const uint32_t kOdometryColor = 0x70FF0000;
@@ -208,160 +183,7 @@ static const uint32_t kObjectColor = 0xFF56C4C3;
 
 
 
-
-
-
-
-
-
-double total_runtime = 0.0;
-int num_completed_cycles = 0;
-int num_total_constraints = 0;
-vector<SingleInput> input_history;
-vector<SingleInput> logged_input;
-int current_replay_index = 0;
-int correction_number = 0;
-
-
-
-
-
-
-
-
-
-
-// Robot's starting angle.
-float kStartingAngle = 0.0;
-// Uncertainty of translation in the direction of travel.
-float kRadialTranslationUncertainty = 0.05;
-// Uncertainty of translation perpendicular to the direction of travel.
-float kTangentialTranslationUncertainty = 0.05;
-// Uncertainty of rotation in radians after moving 1 radian.
-float kAngleUncertainty = 0.05;
-// Scaling constant to correct for error in angular odometry.
-float kOdometryRotationScale = 1.0;
-// Scaling constant to correct for error in translation odometry.
-float kOdometryTranslationScale = 1.0;
-// Minimum distance of observed points from the robot.
-float kMinPointCloudRange = 0.2;
-// Maximum distance of observed points from the robot.
-float kMaxPointCloudRange = 6.0;
-// Maximum distance between adjacent points to use for computation of normals.
-float kMaxNormalPointDistance = 0.03;
-// Angular margin from the scan area boundary to ignore laser readings.
-float kAngularMargin = 0.0;
-
-
-
-
-
-
-
-
-
 //TODO: figure out decent config setup
-// WatchFiles to track changes to config files.
-//WatchFiles watch_files_;
-
-// Config reader for localization options.
-//ConfigReader config_((kCobotStackPath + "/").c_str());
-
-
-/*
-
-bool LoadConfiguration(VectorMapping::VectorMappingOptions* options) {
-  if (!config_.readFiles()) return false;
-
-  ConfigReader::SubTree c(config_,"VectorMapping");
-  bool error = false;
-  error = error || !c.getReal("radial_translation_uncertainty",
-                              kRadialTranslationUncertainty);
-  error = error || !c.getReal("tangential_translation_uncertainty",
-                              kTangentialTranslationUncertainty);
-  error = error || !c.getReal("angle_uncertainty", kAngleUncertainty);
-  error = error || !c.getReal("odometry_translation_scale",
-                              kOdometryTranslationScale);
-  error = error || !c.getReal("odometry_rotation_scale",
-                              kOdometryRotationScale);
-  error = error || !c.getReal("min_point_cloud_range", kMinPointCloudRange);
-  error = error || !c.getReal("max_point_cloud_range", kMaxPointCloudRange);
-  error = error || !c.getReal("max_normal_point_distance",
-                              kMaxNormalPointDistance);
-#ifdef NDEBUG
-  error = error || !c.getInt("num_threads", options->kNumThreads);
-#else
-  options->kNumThreads = 1;
-#endif
-
-  options->kMinRange = kMinPointCloudRange;
-  options->kMaxRange = kMaxPointCloudRange;
-
-  error = error || !c.getReal("robot_laser_offset.x",
-                              options->sensor_offset.x());
-  error = error || !c.getReal("robot_laser_offset.y",
-                              options->sensor_offset.y());
-  error = error || !c.getReal("min_rotation", options->minimum_node_rotation);
-  error = error || !c.getReal("min_translation",
-                              options->minimum_node_translation);
-  error = error || !c.getInt("max_correspondences_per_point",
-                             options->kMaxCorrespondencesPerPoint);
-  error = error || !c.getReal("laser_std_dev",
-                              options->kLaserStdDev);
-  error = error || !c.getReal("point_correlation_factor",
-                              options->kPointPointCorrelationFactor);
-  error = error || !c.getReal("odometry_radial_stddev_rate",
-                              options->kOdometryRadialStdDevRate);
-  error = error || !c.getReal("odometry_tangential_stddev_rate",
-                              options->kOdometryTangentialStdDevRate);
-  error = error || !c.getReal("odometry_angular_stddev_rate",
-                              options->kOdometryAngularStdDevRate);
-  error = error || !c.getReal("odometry_translation_min_stddev",
-                              options->kOdometryTranslationMinStdDev);
-  error = error || !c.getReal("odometry_translation_max_stddev",
-                              options->kOdometryTranslationMaxStdDev);
-  error = error || !c.getReal("odometry_rotation_min_stddev",
-                              options->kOdometryAngularMinStdDev);
-  error = error || !c.getReal("odometry_rotation_max_stddev",
-                              options->kOdometryAngularMaxStdDev);
-  error = error || !c.getReal("point_match_threshold",
-                              options->kPointMatchThreshold);
-  error = error || !c.getReal("max_stf_angle_error",
-                              options->kMaxStfAngleError);
-  error = error || !c.getInt("pose_increment",
-                              options->kPoseIncrement);
-  error = error || !c.getInt("max_history",
-                             options->kMaxHistory);
-  error = error || !c.getInt("max_solver_iterations",
-                             options->max_solver_iterations);
-  error = error || !c.getInt("max_repeat_iterations",
-                             options->kMaxRepeatIterations);
-  error = error || !c.getInt("num_repeat_iterations",
-                             options->kNumRepeatIterations);
-  error = error || !c.getUInt("min_episode_length",
-                              options->kMinEpisodeLength);
-  error = error || !c.getUInt("num_skip_readings",
-                             options->num_skip_readings);
-  error = error || !c.getReal("angle_margin",
-                              kAngularMargin);
-  error = error || !c.getReal("max_update_period",
-                              options->max_update_period);
-  //error = error || !relocalization_lidar_params_.LoadFromConfig(&config_);
-
-  return !error;
-}
-
-*/
-
-
-
-
-
-
-
-
-
-
 
 
 //Load point clouds into ROBOT FRAME
@@ -743,94 +565,6 @@ void DisplayPoses() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-void GetCovarianceFromRelativePose(const Vector2f& relative_location,
-                                   const float& relative_angle,
-                                   Matrix3f* covariance) {
-  covariance->setZero();
-  if (relative_location.norm() > FLT_MIN) {
-    const Vector2f radial_direction(relative_location.normalized());
-    const Vector2f tangential_direction(Rotation2Df(M_PI_2) * radial_direction);
-    Matrix2f eigenvectors;
-    eigenvectors.leftCols<1>() = radial_direction;
-    eigenvectors.rightCols<1>() = tangential_direction;
-    Matrix2f eigenvalues;
-    eigenvalues.setZero();
-    eigenvalues(0, 0) = kRadialTranslationUncertainty;
-    eigenvalues(1, 1) = kTangentialTranslationUncertainty;
-    covariance->block<2, 2>(0, 0) =
-        eigenvectors * eigenvalues * (eigenvectors.transpose());
-  }
-  (*covariance)(2, 2) = kAngleUncertainty * fabs(relative_angle);
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*
 
 void SaveLoggedPoses(const string& filename,
@@ -845,6 +579,10 @@ void SaveLoggedPoses(const string& filename,
             logged_poses[i].angle);
   }
 }
+
+
+
+
 
 //transform point clouds and save them in WORLD FRAME
 void SaveStfsandCovars(
@@ -933,23 +671,22 @@ void SaveStfsandCovars(
 
 //TODO: load log file - make work
 
-/*
 
-vector<SingleInput> LoadLogFile(const string& log_file) {
-  vector<SingleInput> logged_input;
+
+void LoadLogFile() {
   string full_line;
   string line;
 
-  std::fstream stream(log_file);
+  std::fstream stream(log_file_);
 
-  getline(stream, full_line);
-  double total_time = stod(full_line);
-  cout << "total_time: " << total_time << endl;
+  //getline(stream, full_line);
+  //double total_time = stod(full_line);
+  //cout << "total_time: " << total_time << endl;
   getline(stream, full_line);
   int num_entries = stoi(full_line);
-  getline(stream, full_line);
-  int num_constraints = stoi(full_line);
-  cout << "num constriants: " << num_constraints << endl;
+  //getline(stream, full_line);
+  //int num_constraints = stoi(full_line);
+  //cout << "num constriants: " << num_constraints << endl;
 
   for (int i = 0; i < num_entries; ++i) {
     if (getline(stream, full_line)) {
@@ -977,7 +714,7 @@ vector<SingleInput> LoadLogFile(const string& log_file) {
         one_input.type_of_constraint = CorrectionType::kCornerCorrection;
       }
       else if (constraint_type == 2 || constraint_type == 4 ||
-               constraint_type == 5 || constraint_type == 7) { // other
+               constraint_type == 5 || constraint_type == 6) { // other
         num_selected_points = 4;
         if (constraint_type == 2) {
           one_input.type_of_constraint = CorrectionType::kLineSegmentCorrection;
@@ -1009,7 +746,7 @@ vector<SingleInput> LoadLogFile(const string& log_file) {
         logged_selected_points.push_back(new_point);
       }
       one_input.input_points = logged_selected_points;
-      logged_input.push_back(one_input);
+      input_log_.push_back(one_input);
 
       cout << constraint_type << ", " << one_input.undone << endl;
       for (size_t j = 0; j < one_input.input_points.size(); ++j) {
@@ -1021,28 +758,7 @@ vector<SingleInput> LoadLogFile(const string& log_file) {
       break;
     }
   }
-
-  return logged_input;
 }
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1055,24 +771,25 @@ vector<SingleInput> LoadLogFile(const string& log_file) {
 //TODO make this work
 
 
-/*
 
-void LogActivity() {
-  clock_gettime(CLOCK_MONOTONIC, &ms2);
-  total_runtime =  (ms2.tv_sec - ms1.tv_sec) +
-                  ((ms2.tv_nsec - ms1.tv_nsec) / 1000000000.00);
-  cout << "total runtime: " << total_runtime << endl;
-  if (log_file == NULL) {
-    num_total_constraints = human_constraints_.size();
 
-    std::stringstream ss;
-    ss.str(bag_name);
-    string item;
-    vector<string> elems;
-    while (getline(ss, item, '.')) {
-      elems.push_back(item);
-    }
-    bag_name = elems[0];
+void LogActivity(vector<SingleInput> input_log) {
+  //double curr_time;
+  //clock_gettime(CLOCK_MONOTONIC, &curr_time);
+  //total_runtime =  (ms2.tv_sec - ms1.tv_sec) +
+  //                ((ms2.tv_nsec - ms1.tv_nsec) / 1000000000.00);
+  //cout << "total runtime: " << total_runtime << endl;
+  //if (log_file == NULL) {
+    //num_total_constraints = human_constraints_.size();
+
+    //std::stringstream ss;
+    //ss.str(pose_graph_file);
+    //string item;
+    //vector<string> elems;
+    //while (getline(ss, item, '.')) {
+    //  elems.push_back(item);
+    //}
+    //bag_name = elems[0];
 
     time_t t = time(0);   // get time now
     struct tm * now = localtime( & t );
@@ -1084,35 +801,25 @@ void LogActivity() {
     string sec = std::to_string(now->tm_sec);
 
     string log_date = year +"-"+ mon +"-"+ day +"-"+ hour +"-"+ min +"-"+ sec;
-    string log_name = bag_name + "_logged_" + log_date + ".log";
+    string log_name = string(pose_graph_file_) + "_logged_" + log_date + ".log";
 
     ScopedFile fid(log_name, "w");
-    fprintf(fid(), "%.4f \n", total_runtime);
-    fprintf(fid(), "%d \n", num_completed_cycles);
-    fprintf(fid(), "%d \n", num_total_constraints);
-    for (size_t i = 0; i < input_history.size(); ++i) {
-      fprintf(fid(), "%d, %d\n", input_history[i].type_of_constraint,
-                                input_history[i].undone);
-      cout << "writing undone status: " << input_history[i].undone << endl;
-      for (size_t j = 0; j < input_history[i].input_points.size(); ++j) {
-        fprintf(fid(), "%.4f, %.4f\n", input_history[i].input_points[j](0),
-                                     input_history[i].input_points[j](1));
+    //fprintf(fid(), "%.4f \n", total_runtime);
+    //int num_entries = int(input_log.size());
+    int num_entries = input_log.size();
+    fprintf(fid(), "%d \n", num_entries);
+    //fprintf(fid(), "%d \n", num_total_constraints);
+    for (size_t i = 0; i < input_log.size(); ++i) {
+      fprintf(fid(), "%d, %d\n", input_log[i].type_of_constraint,
+                                 input_log[i].undone);
+      //cout << "writing undone status: " << input_history[i].undone << endl;
+      for (size_t j = 0; j < input_log[i].input_points.size(); ++j) {
+        fprintf(fid(), "%.4f, %.4f\n", input_log[i].input_points[j](0),
+                                       input_log[i].input_points[j](1));
       }
     }
-  }
+  //}
 }
-
-*/
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1138,12 +845,6 @@ bool MouseDragged(const vector_slam_msgs::GuiMouseClickEvent& msg) {
 
 
 
-
-
-
-
-
-
 void KeyboardRequestCallback(const vector_slam_msgs::GuiKeyboardEvent& msg) {
   // Code for 'p' key, for Provide correction
   if (msg.keycode == 0x50) {
@@ -1154,30 +855,23 @@ void KeyboardRequestCallback(const vector_slam_msgs::GuiKeyboardEvent& msg) {
       DisplayPoses();
     }
   }
-  //TODO finish
-  /*
   else if (msg.keycode == 0x55) { // key code 85, 'u' for undo
     cout << "undo" << endl;
-    cout << (log_file == NULL) << endl;
-    if (log_file == NULL) {
-      poses = prev_poses;
-      covariances = prev_covariances_;
-      input_history.back().undone = 1;
-//       cout << (added_human_constraints > 0) << endl;
-      if (added_human_constraints > 0) {
-        cout << "removing constraints" << endl;
-        for (int i = 0; i < added_human_constraints; ++i) {
-          human_constraints_.pop_back();
-        }
-        added_human_constraints = 0;
+    if (correction_mode_on_) {
+      cout << "Cannot undo while in correction mode." << endl;
+      return;
+    }
+    //cout << (log_file == NULL) << endl;
+    if (!replay_mode_) {
+      bool valid_undo = hitl_slam_session_.undo();
+      if (valid_undo) {
+        DisplayPoses();
       }
-      ClearDrawingMessage(&display_message_);
-      DisplayPoses(poses, init_point_clouds, normal_clouds, save_image_file);
     }
     else {
-      cout << "undo not allowed in log replay mode." << endl;
+      cout << "Undo not allowed in log replay mode." << endl;
     }
-  }
+  }/*
   else if (msg.keycode == 0x56) { //key code 86, 'v' for save
     cout << "Are you sure you want to save? (y/n)" << endl;
     string s;
@@ -1204,12 +898,28 @@ void KeyboardRequestCallback(const vector_slam_msgs::GuiKeyboardEvent& msg) {
       }
       cout << "time to ctrl-C!" << endl;
     }
-  }
+  }*/
   else if (msg.keycode == 0x4C) { //key code 76, 'l' for log
     cout << "step ahead log" << endl;
-//     cout << "not currently available" << endl;
-    ReplayLog();
-  }*/
+    if (replay_mode_) {
+      while (input_log_[current_log_index_].undone) {
+        current_log_index_++;
+        if (current_log_index_ >= int(input_log_.size())) {
+          replay_mode_ = false;
+          break;
+        }
+      }
+      hitl_slam_session_.replayLog(input_log_[current_log_index_]);
+      current_log_index_++;
+      if (current_log_index_ >= int(input_log_.size())) {
+        replay_mode_ = false;
+      }
+    }
+    else {
+      cout << "No logs to replay. Either no log file was loaded, "
+           << "or all logs have already been replayed" << endl;
+    }
+  }
 }
 
 
@@ -1228,18 +938,12 @@ void MouseClickCallback(const vector_slam_msgs::GuiMouseClickEvent& msg) {
 
 
 
-
-
-
-
-
-
 //Signal handler for breaks (Ctrl-C)
 void HandleStop(int i) {
-  if (log_file_ == NULL) {
-    //TODO: make this work
-    //LogActivity();
-  }
+  //if (log_file_ == NULL) {
+    vector<SingleInput> input_log = hitl_slam_session_.getInputHistory();
+    LogActivity(input_log);
+  //}
   printf("\nTerminating.\n");
   exit(0);
 }
@@ -1312,13 +1016,13 @@ int main(int argc, char** argv) {
 
   
   
-  if (pose_graph_file_ == NULL && log_file_ == NULL) {
+  if (pose_graph_file_ == NULL) {
     fprintf(stderr,
-        "ERROR: Must Specify pose-graph file (-P), or log file (-L)\n");
+        "ERROR: Must Specify pose-graph file (-P), (and optionally) log file (-L)\n");
     return 1;
   }
-  else if (pose_graph_file_ != NULL) {
-    cout << "got pose graph" << endl;
+  else if (pose_graph_file_ != NULL && log_file_ == NULL) {
+    cout << "got pose graph only" << endl;
     
     vector<Pose2Df> odom;
     vector<PointCloudf> rob_frame_pcs;
@@ -1335,9 +1039,21 @@ int main(int argc, char** argv) {
   }
   else if (log_file_ != NULL) {
     cout << "got log file" << endl;
-    //TODO: make log replay work
-    //BatchLocalize(keyframes, max_laser_poses,
-    //              !disable_stfs, time_skip, return_initial_poses);
+
+    vector<Pose2Df> odom;
+    vector<PointCloudf> rob_frame_pcs;
+    vector<NormalCloudf> norm_clouds;
+    vector<Matrix3f> covars;
+    vector<Pose2Df> poses;
+
+    loadPoseGraph(true, &odom, &rob_frame_pcs, &norm_clouds, &poses, &covars);
+
+    hitl_slam_session_.init(odom, rob_frame_pcs, norm_clouds, covars, poses);
+
+    LoadLogFile();
+    
+    replay_mode_ = true;
+ 
   }
 
   ros::spin();

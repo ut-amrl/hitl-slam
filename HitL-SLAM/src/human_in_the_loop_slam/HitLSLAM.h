@@ -21,15 +21,18 @@ class HitLSLAM {
               const std::vector<perception_2d::NormalCloudf> norm_clouds,
               std::vector<Eigen::Matrix3f> covars,
               std::vector<perception_2d::Pose2Df> poses);
-    void replayFromLog(const std::vector<SingleInput> input_log);
+    void replayLog(const SingleInput logged_input);
     void addCorrectionPoints(const uint32_t type, 
                              const Eigen::Vector2f mouse_down, 
                              const Eigen::Vector2f mouse_up);
+
+    bool undo();
  
     std::vector<perception_2d::Pose2Df> getPoses();
     std::vector<Eigen::Matrix3f> getCovariances();
     std::vector<perception_2d::PointCloudf> getWorldFrameScans();
-
+    std::vector<SingleInput> getInputHistory();
+  
     //TODO: getter for ceres information such as gradients, 
     //      constraint membership, point to point correspondences, etc.
     

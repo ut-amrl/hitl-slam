@@ -119,16 +119,20 @@ void HitLSLAM::init(const vector<Pose2Df> odom,
   transformPointCloudsToWorldFrame();
 }
 
-std::vector<perception_2d::Pose2Df> HitLSLAM::getPoses() {
+vector<Pose2Df> HitLSLAM::getPoses() {
   return poses_;
 }
 
-std::vector<Matrix3f> HitLSLAM::getCovariances() {
+vector<Matrix3f> HitLSLAM::getCovariances() {
   return covariances_;
 }
 
-std::vector<perception_2d::PointCloudf> HitLSLAM::getWorldFrameScans() {
+vector<PointCloudf> HitLSLAM::getWorldFrameScans() {
   return WORLD_FRAME_point_clouds_;
+}
+
+vector<SingleInput> HitLSLAM::getInputHistory() {
+  return input_history_;
 }
 
 //TODO: define getter todo from header
@@ -255,9 +259,25 @@ void HitLSLAM::resetCorrectionInputs() {
   correction_type_ = CorrectionType::kUnknownCorrection;
 }
 
+bool HitLSLAM::undo() {
+  if (input_history_.size() == 0) {
+    cout << "Nothing to undo." << endl;
+    return false;
+  }
+  if (input_history_.back().undone) {
+    cout << "Already undone to max depth (1)." << endl;
+    return false;
+  }
+  poses_ = prev_poses_;
+  covariances_ = prev_covariances_;
+  input_history_.back().undone = 1;
+  human_constraints_.pop_back();
+  return true;
+}
 
-
-void HitLSLAM::replayFromLog(const vector<SingleInput> input_log) {
+void HitLSLAM::replayLog(const SingleInput logged_input) {
+  correction_type_ = logged_input.type_of_constraint;
+  selected_points_ = logged_input.input_points;
   size_t points_verified = verifyUserInput();
   cout << "points verified: " << points_verified << endl;
 
@@ -265,12 +285,12 @@ void HitLSLAM::replayFromLog(const vector<SingleInput> input_log) {
 
     prev_poses_ = poses_;
     prev_covariances_ = covariances_;
-    SingleInput current_input;
-    current_input.type_of_constraint = correction_type_;
-    current_input.input_points = selected_points_;
-    current_input.undone = 0;
-    input_history_.push_back(current_input);
-    printf("correction type: %d\n", input_history_.back().type_of_constraint);
+    //SingleInput current_input;
+    //current_input.type_of_constraint = correction_type_;
+    //current_input.input_points = selected_points_;
+    //current_input.undone = 0;
+    //input_history_.push_back(current_input);
+    //printf("correction type: %d\n", input_history_.back().type_of_constraint);
       
     em_input_.local_version_point_clouds_ = WORLD_FRAME_point_clouds_;
     em_input_.selected_points_ = selected_points_;
@@ -368,7 +388,7 @@ void HitLSLAM::Run() {
     prev_poses_ = poses_;
     prev_covariances_ = covariances_;
     SingleInput current_input;
-    printf("correction type: %d\n", static_cast<size_t>(correction_type_));
+    //printf("correction type: %d\n", static_cast<size_t>(correction_type_));
     current_input.type_of_constraint = correction_type_;
     current_input.input_points = selected_points_;
     current_input.undone = 0;
