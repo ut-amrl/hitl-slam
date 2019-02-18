@@ -82,7 +82,7 @@ $ make
 ### 1. Download Datasets
 
 Example data collected at University of Massachusetts Amherst, and used in the corresponding paper can be found 
-[here](https://greyhound.cs.umass.edu/owncloud/index.php/apps/files/?dir=/laser_datasets/HitL_datasets/). In particular,
+[here](https://drive.google.com/drive/folders/1pJwrTICjhif249Y_vkv5TUyY-FOCpp9A?usp=sharing). In particular,
 some of the following examples will use data from the file `2016-02-16-16-01-46.bag.stfs.covars` which can be found in the 
 `Figure8` subdirectory within `/HitL_datasets`. Once downloaded, move the files into a directory of your choice, for example: 
 `hitl-slam/HitL-SLAM/exampledata/`.
@@ -93,7 +93,9 @@ To execute HitL-SLAM, please see the section titled **Running Human-in-the-Loop 
 
 ### 1. Download Datasets
 
-HitL-SLAM can be used on other datasets as well, as long as they are 2D, and based on depth scans or depth images. Many well-known datasets of this nature can be found [here](http://cres.usc.edu/radishrepository/view-all.php). After downloading a dataset or generating some data yourself, it needs to be put into the right format.
+HitL-SLAM can be used on other datasets as well, as long as they are 2D, and
+based on depth scans or depth images. Many well-known datasets of this nature
+can be found [here](http://ais.informatik.uni-freiburg.de/slamevaluation/datasets.php). After downloading a dataset or generating some data yourself, it needs to be put into the right format.
 
 ### 2. Convert Data to Homogenous Format
 
