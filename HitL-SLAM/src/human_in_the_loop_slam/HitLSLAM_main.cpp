@@ -768,9 +768,6 @@ void LoadLogFile() {
 
 
 
-//TODO make this work
-
-
 
 
 void LogActivity(vector<SingleInput> input_log) {

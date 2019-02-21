@@ -220,10 +220,11 @@ int main(int argc, char *argv[]) {
 
   //InitHandleStop(&runApp);
   display_->show();
-  const string mapsFolder =
-      ros::package::getPath("cobot_linux") + "/../maps";
+  //const string mapsFolder = ros::package::getPath("cobot_linux") + "/../maps";
+  const string mapsFolder = "mapsFolder";
   thread_ = new VectorDisplayThread(mapsFolder, display_, &node_handle, app);
-  const string map_name = (map_option == NULL) ? "LGRC3" : string(map_option);
+  //const string map_name = (map_option == NULL) ? "LGRC3" : string(map_option);
+  const string map_name = "empty";
   thread_->setOptions(testMode, map_name, saveLocs, liveView, persistentDisplay,
       savePoses, blankDisplay, maxFps, nav_map, semantic_map,
       semantic_view, nav_view, vector_file);
@@ -237,10 +238,12 @@ int main(int argc, char *argv[]) {
   if (window_location_x != FLT_MAX || window_location_y != FLT_MAX) {
     if (window_location_x == FLT_MAX) window_location_x = 0.0;
     if (window_location_y == FLT_MAX) window_location_y = 0.0;
-  } else {
-    ConfigReader config_((ros::package::getPath("cobot_linux") + "/").c_str());
+  }
+  else {
+    //ConfigReader config_((ros::package::getPath("cobot_linux") + "/").c_str());
+    ConfigReader config_((ros::package::getPath("HitL-SLAM") + "/").c_str());
     config_.init();
-    config_.addFile("../robot.cfg");
+    config_.addFile("config/robot.cfg");
     config_.addFile("config/non_markov_localization.cfg");
     if (!config_.readFiles()) return false;
     ConfigReader::SubTree c(config_,"NonMarkovLocalization");

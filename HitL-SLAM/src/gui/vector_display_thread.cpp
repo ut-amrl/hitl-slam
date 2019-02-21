@@ -1191,6 +1191,7 @@ VectorDisplayThread::VectorDisplayThread(
   tHumanTrack = 0.0;
   this->setOptions(false, "GHC7", false, false, true, false, false, 60.0,
                    false, false, false, false, false);
+  //fix to unbreak ChangeMap
   mapsFolder = _mapsFolder;
   pathPlan.clear();
   localizationInitMsg.header.seq = 0;
