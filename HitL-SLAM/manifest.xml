@@ -15,7 +15,7 @@
   <depend package="roscpp"/>
   <depend package="vector_slam_msgs"/>
   <depend package="rosbag"/>
-  <depend package="evid70_camera"/>
+  <!-- <depend package="evid70_camera"/> -->
   <depend package="visualization_msgs"/>
   <depend package="tf"/>
   <depend package="rospy"/>

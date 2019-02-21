@@ -3,6 +3,7 @@
 
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
+#include <vector>
 
 enum class CorrectionType : uint32_t {
   kUnknownCorrection = 0,

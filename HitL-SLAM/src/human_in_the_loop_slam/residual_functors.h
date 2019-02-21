@@ -28,7 +28,8 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Geometry>
 #include <boost/concept_check.hpp>
-
+#include <functional>
+#include <numeric>
 #include "../shared/util/openmp_utils.h"
 //#include "vector_localization/non_markov_localization.h"
 
