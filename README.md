@@ -41,8 +41,7 @@ The * denotes dependencies which should be installed by following the install in
 Use the following command to install dependencies:
 
 ```bash
-$ sudo apt-get install g++ cmake libpopt-dev cimg-dev libncurses5-dev
-libglew-dev lua5.1 lua5.1-policy-dev
+$ sudo apt-get install g++ cmake libpopt-dev cimg-dev libncurses5-dev libglew-dev lua5.1 lua5.1-policy-dev
 ```
 
 ## Compiling
