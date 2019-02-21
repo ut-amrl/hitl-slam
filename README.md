@@ -28,6 +28,9 @@ Link to paper: [https://arxiv.org/pdf/1711.08566.pdf](https://arxiv.org/pdf/1711
 - [popt](http://www.freshmeat.sourceforge.net/projects/popt)
 - [CImg](http://www.cimg.eu/)
 - [OpenMP](http://www.openmp.org/)
+- [ncurses](https://www.gnu.org/software/ncurses/)
+- [GLEW](http://glew.sourceforge.net/)
+- [Lua](https://www.lua.org/)
 - [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu)* or later
 - [Ceres Solver](http://www.ceres-solver.org/)*
 
@@ -38,7 +41,8 @@ The * denotes dependencies which should be installed by following the install in
 Use the following command to install dependencies:
 
 ```bash
-$ sudo apt-get install g++ cmake libpopt-dev cimg-dev
+$ sudo apt-get install g++ cmake libpopt-dev cimg-dev libncurses5-dev
+libglew-dev lua5.1 lua5.1-policy-dev
 ```
 
 ## Compiling
