@@ -36,7 +36,9 @@
 //#include "../map/vector_map.h"
 #include "../episodic_non_markov_localization/vector_mapping.h"
 
+#define cimg_use_png
 #include <CImg.h>
+#include "png.h"
 
 //#include "../../extern_libraries/CImg/CImg.h"
 
