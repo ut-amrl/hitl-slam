@@ -1024,20 +1024,29 @@ void JointOpt::AddHumanConstraints(ceres::Problem* problem) {
         float anchor_pose_angle = poses_[constraint.anchor_pose_id].angle;
         float t_angle = anchor_pose_angle + constraint.delta_angle;
         float target_angle = atan2(sin(t_angle), cos(t_angle));
+        // problem->AddResidualBlock(
+        //     new AutoDiffCostFunction<PerpendicularHumanImposedConstraint, 1, 1>(
+        //       new PerpendicularHumanImposedConstraint(
+        //                                               double(target_angle))), NULL, 
+        //                                            &(pose_array_[3 * constraint.constrained_pose_id + 2]));
         problem->AddResidualBlock(
-            new AutoDiffCostFunction<PerpendicularHumanImposedConstraint, 1, 1>(
-              new PerpendicularHumanImposedConstraint(double(target_angle))), NULL, 
-                                                   &(pose_array_[3 * constraint.constrained_pose_id + 2]));
+            new AutoDiffCostFunction<PerpendicularHumanImposedConstraint, 1, 3>(
+              new PerpendicularHumanImposedConstraint( double(target_angle))), NULL, 
+                                                   &(pose_array_[3 * constraint.constrained_pose_id]));
         num_hc_residuals_ += 1;
       }
       else if (constraint.constraint_type == CorrectionType::kParallelCorrection) {
         float anchor_pose_angle = poses_[constraint.anchor_pose_id].angle;
         float t_angle = anchor_pose_angle + constraint.delta_angle;
         float target_angle = atan2(sin(t_angle), cos(t_angle));
+        // problem->AddResidualBlock(
+        //     new AutoDiffCostFunction<ParallelHumanImposedConstraint, 1, 1>(
+        //       new ParallelHumanImposedConstraint(double(target_angle))), NULL, 
+        //                                            &(pose_array_[3 * constraint.constrained_pose_id + 2]));
         problem->AddResidualBlock(
-            new AutoDiffCostFunction<ParallelHumanImposedConstraint, 1, 1>(
+            new AutoDiffCostFunction<ParallelHumanImposedConstraint, 1, 3>(
               new ParallelHumanImposedConstraint(double(target_angle))), NULL, 
-                                                   &(pose_array_[3 * constraint.constrained_pose_id + 2]));
+                                                   &(pose_array_[3 * constraint.constrained_pose_id]));
         num_hc_residuals_ += 1;
       }
     }
@@ -1301,7 +1310,8 @@ void JointOpt::Run() {
   
   std::cout << "set params" << std::endl;
   
-  cimg_library::CImg<float> info_base(3074, 3074, 1, 1, 0);
+  size_t img_size = poses_.size();
+  cimg_library::CImg<float> info_base(img_size, img_size, 1, 1, 0); // Fix static img size definition
 
 //   info_mat_(int(poses_.size()), int(poses_.size()), 1, 1, 0);
   std::cout << poses_.size() << std::endl;

@@ -1381,9 +1381,11 @@ struct PerpendicularHumanImposedConstraint {
 
     T fitt = T(0.0);
     
+    // fitt = t_target_ - parameters[2]; // modified by arthur
     fitt = t_target_ - parameters[2];
     
-    residuals[2] = Ka * fitt;
+    // residuals[2] = Ka * fitt; // modified by arthur
+    residuals[0] = Ka * fitt; // modified by arthur
 
     return true;
   }
@@ -1404,7 +1406,7 @@ struct ParallelHumanImposedConstraint {
     
     fitt = t_target_ - parameters[2];
     
-    residuals[2] = Ka * fitt;
+    residuals[0] = Ka * fitt; // modified by arthur
 
     return true;
   }
