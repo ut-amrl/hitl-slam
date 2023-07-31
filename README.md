@@ -44,6 +44,18 @@ Use the following command to install dependencies:
 $ sudo apt-get install g++ cmake libpopt-dev cimg-dev libncurses5-dev libglew-dev lua5.1 lua5.1-policy-dev
 ```
 
+### 2023 Update
+
+Qt4 (one of the dependencies) has been deprecated for Ubuntu 20.04. To install it, follow the steps below.
+1. Add google cloud sdk key if needed. [Help link to do so](https://serverfault.com/questions/906972/the-following-signatures-couldnt-be-verified-because-the-public-key-is-not-avai)
+2. Install Qt4 via [alternate method](https://askubuntu.com/questions/1274134/cannot-install-qt-4-on-ubuntu-20-04-quite-universal-circuit-simulator-qucs)
+
+CImg also have issues saving pnd files on Ubuntu 20.04. To fix that, use libpng and link it for CImg to use instead.
+1. Using libpng within [cimg library](https://stackoverflow.com/questions/4001816/loading-pngs-with-cimg)
+2. Installing libpng [here](https://askubuntu.com/questions/1267837/how-to-install-libpng-1-6-37-tar-xz-in-ubuntu-20-04#:~:text=It%27s%20easy.,installation%20should%20go%20by%20smoothly)
+3. Installing zlib [here](https://itsfoss.com/install-zlib-ubuntu/)
+4. Include libpng into [cmake linker](https://stackoverflow.com/questions/30980383/cmake-compile-options-for-libpng). Note you will not have to do this step if you use coda branch.
+
 ## Compiling
 
 ### 1. ROS Environment Setup
