@@ -684,9 +684,9 @@ void LoadLogFile() {
   //cout << "total_time: " << total_time << endl;
   getline(stream, full_line);
   int num_entries = stoi(full_line);
-  //getline(stream, full_line);
-  //int num_constraints = stoi(full_line);
-  //cout << "num constriants: " << num_constraints << endl;
+  // getline(stream, full_line);
+  // int num_constraints = stoi(full_line);
+  // cout << "num constriants: " << num_constraints << endl;
 
   for (int i = 0; i < num_entries; ++i) {
     if (getline(stream, full_line)) {
@@ -695,7 +695,9 @@ void LoadLogFile() {
       iss << full_line;
       getline(iss, line, ',');
       int constraint_type = stoi(line);
+      cout << "constraint type " << line << endl;
       getline(iss, line, ',');
+      cout << "undone line " << line << endl;
       int undone = stoi(line);
       //cout << constraint_type << endl;
       //cout << undone << endl;
@@ -758,6 +760,7 @@ void LoadLogFile() {
       break;
     }
   }
+  cout <<"finished loading"<< endl;
 }
 
 
@@ -881,18 +884,24 @@ void KeyboardRequestCallback(const vector_slam_msgs::GuiKeyboardEvent& msg) {
   else if (msg.keycode == 0x4C) { //key code 76, 'l' for log
     cout << "step ahead log" << endl;
     if (replay_mode_) {
-      while (input_log_[current_log_index_].undone) {
-        current_log_index_++;
-        if (current_log_index_ >= int(input_log_.size())) {
-          replay_mode_ = false;
-          break;
-        }
-      }
+      cout << "starting replay with current log indx " << current_log_index_ << 
+      " and input log size " << input_log_.size() << endl;
+      // while (input_log_[current_log_index_].undone) {
+      //   cout << "incrementing current log index" << endl;
+      //   current_log_index_++;
+      //   if (current_log_index_ >= int(input_log_.size())) {
+      //     replay_mode_ = false;
+      //     break;
+      //   }
+      // }
+      cout <<"replaying log" << endl;
       hitl_slam_session_.replayLog(input_log_[current_log_index_]);
+      DisplayPoses();
       current_log_index_++;
       if (current_log_index_ >= int(input_log_.size())) {
         replay_mode_ = false;
       }
+      cout <<"finished replaying log" << endl;
     }
     else {
       cout << "No logs to replay. Either no log file was loaded, "

@@ -280,9 +280,9 @@ void HitLSLAM::replayLog(const SingleInput logged_input) {
   selected_points_ = logged_input.input_points;
   size_t points_verified = verifyUserInput();
   cout << "points verified: " << points_verified << endl;
-
+  cout << "selecte points size: " << selected_points_.size() << endl;
   if (points_verified == selected_points_.size()) {
-
+    cout << "Entered replayLog pose playback" << endl;
     prev_poses_ = poses_;
     prev_covariances_ = covariances_;
     //SingleInput current_input;
@@ -352,6 +352,8 @@ void HitLSLAM::replayLog(const SingleInput logged_input) {
 
       poses_ = joint_opt_.poses_;
 
+      transformPointCloudsToWorldFrame();
+      cout << "Finished updating poses from replayLog step" << endl;
       //ceres_gradients_ = joint_opt_.gradients_;
       //ceres_jacobian_ = joint_opt_.ceres_jacobian_;
       //jacobian_init_ = true;
